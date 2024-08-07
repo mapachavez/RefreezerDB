@@ -46,3 +46,46 @@ CREATE TABLE PROFORMA (
     FOREIGN KEY (ID_Proyecto) REFERENCES PROYECTO(ID_Proyecto),
     FOREIGN KEY (ID_Cliente) REFERENCES CLIENTE(ID_Cliente)
 );
+CREATE TABLE SERVICIO (
+    ID_Servicio INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion TEXT NOT NULL,
+    costo_servicio DECIMAL(10, 2) NOT NULL,
+    estado VARCHAR(50) CHECK(estado like "En progreso" OR estado like "Terminado") NOT NULL DEFAULT "En progreso",
+    garantia INT,
+    Fecha_inicio DATE NOT NULL,
+    Fecha_fin DATE,
+    ID_Cliente int NOT NULL,
+    FOREIGN KEY (ID_Cliente) REFERENCES CLIENTE(ID_Cliente)
+);
+
+CREATE TABLE EMPLEADO (
+    ID_Empleado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    cargo VARCHAR(50) NOT NULL,
+    correo VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE EMPLEADO_SERVICIO (
+    ID_Empleado INT,
+    ID_Servicio INT,
+    PRIMARY KEY (ID_Empleado, ID_Servicio),
+    FOREIGN KEY (ID_Empleado) REFERENCES EMPLEADO(ID_Empleado),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
+);
+
+CREATE TABLE CERTIFICADO (
+    ID_Certificado INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion TEXT NOT NULL,
+    fecha_vigencia DATE NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    ID_Empleado INT NOT NULL,
+    FOREIGN KEY (ID_Empleado) REFERENCES EMPLEADO(ID_Empleado)
+);
+
+CREATE TABLE EMPLEADO_CERTIFICADO (
+    ID_Certificado INT,
+    ID_Empleado INT,
+    PRIMARY KEY (ID_Certificado, ID_Empleado),
+    FOREIGN KEY (ID_Certificado) REFERENCES CERTIFICADO(ID_Certificado),
+    FOREIGN KEY (ID_Empleado) REFERENCES EMPLEADO(ID_Empleado)
+);
