@@ -1,1 +1,10 @@
+CREATE DATABASE RefreezerDB;
+USE RefreezerDB;
 
+CREATE TABLE CLIENTE (
+    ID_Cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255) NOT NULL,
+    correo VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20) NOT NULL
+);
