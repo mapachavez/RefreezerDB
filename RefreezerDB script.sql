@@ -119,3 +119,20 @@ CREATE TABLE INSTALACION_Y_MONTAJE (
     PRIMARY KEY (ID_Servicio),
     FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
 );
+
+CREATE TABLE INVENTARIO (
+    ID_Inventario INT AUTO_INCREMENT PRIMARY KEY,
+    Stock INT CHECK(Stock >= 0) NOT NULL ,
+    nombre VARCHAR(100) NOT NULL,
+    marca VARCHAR(50) NOT NULL,
+    precio_unidad DECIMAL(10, 2) CHECK(precio_unidad >= 0) NOT NULL
+);
+
+CREATE TABLE MATERIAL (
+    ID_Material INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    marca VARCHAR(50) NOT NULL,
+    precio_unidad DECIMAL(10, 2) CHECK(precio_unidad >= 0) NOT NULL,
+     ID_Inventario INT NOT NULL,
+    FOREIGN KEY (ID_Inventario) REFERENCES INVENTARIO(ID_Inventario)
+);
