@@ -89,3 +89,33 @@ CREATE TABLE EMPLEADO_CERTIFICADO (
     FOREIGN KEY (ID_Certificado) REFERENCES CERTIFICADO(ID_Certificado),
     FOREIGN KEY (ID_Empleado) REFERENCES EMPLEADO(ID_Empleado)
 );
+
+CREATE TABLE SERVICIO_TECNICO (
+    ID_Servicio INT,
+    tipo_servicio TEXT NOT NULL,
+    PRIMARY KEY (ID_Servicio),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
+);
+
+CREATE TABLE DISEÑO_Y_FABRICACION (
+    ID_Servicio INT,
+    diseño TEXT NOT NULL,
+    tipo_diseño TEXT NOT NULL,
+    PRIMARY KEY (ID_Servicio),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
+);
+
+CREATE TABLE MANTENIMIENTO (
+    ID_Servicio INT,
+    Tipo_Mantenimiento TEXT NOT NULL,
+    Name_Unidad_Maquinaria TEXT NOT NULL,
+    PRIMARY KEY (ID_Servicio),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
+);
+
+CREATE TABLE INSTALACION_Y_MONTAJE (
+    ID_Servicio INT,
+    tipo_instalacion TEXT NOT NULL,
+    PRIMARY KEY (ID_Servicio),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio)
+);
