@@ -1,8 +1,28 @@
 # --------------- LIBRERIAS --------------- #
+import mysql.connector
+# --------------- FUNCIONES --------------- #
+def conectar():
+    try:
+        conexion = mysql.connector.connect(
+            host='localhost', # Cambiar por la dirección de tu servidor
+            port = 9999, # Cambiar por el puerto de tu servidor
+            user='user',   # Cambiar por tu nombre de usuario
+            password='password',  # Cambiar por tu contraseña
+            database='refreezerdb'
+            )
+        
+        if conexion.is_connected():
+            print("INFO: Conexión exitosa a la base de datos\n")
+            return conexion
+        
+    except mysql.connector.Error as err:
+        print(f"Error: {err} \n")
+        return None
 # ----------------- MAIN ------------------ #
 
+conexion = conectar() 
 opc = 0
-while(opc != 10): 
+while(opc != 10):
     print(""" ----- MENÚ PRINCIPAL DE REFREEZER -----
         1. Gestión de clientes
         2. Gestión de proformas
