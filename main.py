@@ -12,7 +12,7 @@ def conectar():
             )
         
         if conexion.is_connected():
-            print("INFO: Conexión exitosa a la base de datos\n")
+            print("INFO: Conexión exitosa a la base de datos")
             return conexion
         
     except mysql.connector.Error as err:
@@ -20,14 +20,14 @@ def conectar():
         return None
     
 def gestionClientes(conexion):
-    cursor = conexion.cursor()
     opc = "0"
     while (opc != "5"):
+        cursor = conexion.cursor()
         print("1. Insertar datos")
         print("2. Consultar datos")
         print("3. Modificar datos")
         print("4. Eliminar datos")
-        print("5. Salir")
+        print("5. Regresar")
         
         opc = input("\nIntroduce el número de opción: ")
         
@@ -79,12 +79,58 @@ def gestionClientes(conexion):
                 conexion.rollback()
             finally:
                 cursor.close()
+        if opc == "2":
+            ocon = ""
+            while ocon != "3":
+                print("\n------\t Consulta de clientes \t------")
+                print("1. Clientes naturales")
+                print("2. Clientes empresa")
+                print("3. Regresar")
+                ocon = input("\nIngrese una opcion: ")
+                
+                if ocon == "1":
+                    print("\n---------- \t\t Consulta de clientes naturales \t\t----------\n")
+                    query_ccn = "SELECT * FROM cliente c JOIN cliente_natural USING(ID_cliente)"
+                    
+                    try:
+                        cursor.execute(query_ccn)
+                        rescn = cursor.fetchall()
+
+                        for fila in rescn:
+                            print(f"ID: {fila[0]}| Nombre: {fila[1]}| Direccion: {fila[2]}| Correo: {fila[3]}| Teléfono: {fila[4]}| Cédula: {fila[5]}")
+                        
+                        input("\nConsulta exitosa! \nPresione enter para continuar...")
+
+                    except mysql.connector.Error as err:
+                        print(f"Error: {err}")
+                elif ocon == "2":
+                    print("\n---------- \t\t Consulta de clientes empresa \t\t----------\n")
+                    query_cce = "SELECT * FROM cliente c JOIN cliente_empresa USING(ID_cliente)"
+                    
+                    try:
+                        cursor.execute(query_cce)
+                        resce = cursor.fetchall()
+
+                        for fila in resce:
+                            print(f"ID: {fila[0]}| Nombre: {fila[1]}| Direccion: {fila[2]}| Correo: {fila[3]}| Teléfono: {fila[4]}| RUC: {fila[5]}")
+
+                        input("\nConsulta exitosa! \nPresione enter para continuar...")
+                        
+                    except mysql.connector.Error as err:
+                        print(f"Error: {err}")
+                elif ocon =="3":
+                    input("Regresando al menú anterior...\n")
+                else:
+                    input("Opcion no válida. Intente nuevamente...")
+                    ocon = ""
+                    
+            cursor.close()
 # ----------------- MAIN ------------------ #
 
 conexion = conectar() 
 opc = ""
 while(opc != "10"):
-    print(""" ----- MENÚ PRINCIPAL DE REFREEZER -----
+    print("""\n ----- MENÚ PRINCIPAL DE REFREEZER -----
         1. Gestión de clientes
         2. Gestión de proformas
         3. Gestión de proyectos
