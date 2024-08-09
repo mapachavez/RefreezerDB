@@ -318,7 +318,6 @@ while(opc != "10"):
         print("\nOpcion 9")
         input("Presione enter para continunar...\n")
     elif (opc == "10"):
-        print("\nOpcion 10")
         conexion.close()
         input("Presione enter para cerrar...\n")
     else:
