@@ -318,3 +318,63 @@ INSERT INTO INSTALACION_Y_MONTAJE VALUES
 (8, 'Instalación de Unidad de Refrigeración'),
 (9, 'Optimización de Sistemas de Enfriamiento'),
 (10, 'Revisión de Equipos de Refrigeración');
+
+INSERT INTO INVENTARIO VALUES
+(1, 100, 'Refrigerante R-410A', 'DuPont', 100.00),
+(2, 50, 'Compresor', 'LG', 300.00),
+(3, 30, 'Evaporador', 'Samsung', 200.00),
+(4, 20, 'Condensador', 'Panasonic', 250.00),
+(5, 200, 'Termostato', 'Honeywell', 50.00),
+(6, 40, 'Válvula de Expansión', 'Danfoss', 150.00),
+(7, 60, 'Filtro Deshidratador', 'Parker', 80.00),
+(8, 10, 'Unidad de Control', 'Johnson Controls', 500.00),
+(9, 25, 'Motor Ventilador', 'GE', 120.00),
+(10, 150, 'Sensor de Temperatura', 'Siemens', 70.00);
+
+INSERT INTO MATERIAL VALUES
+(1, 'Refrigerante R-410A', 'DuPont', 100.00,1),
+(2, 'Compresor', 'LG', 300.00,2),
+(3, 'Evaporador', 'Samsung', 200.00,3),
+(4, 'Condensador', 'Panasonic', 250.00,4),
+(5, 'Termostato', 'Honeywell', 50.00,5),
+(6, 'Válvula de Expansión', 'Danfoss', 150.00,6),
+(7, 'Filtro Deshidratador', 'Parker', 80.00,7),
+(8, 'Unidad de Control', 'Johnson Controls', 500.00,8),
+(9, 'Motor Ventilador', 'GE', 120.00,9),
+(10, 'Sensor de Temperatura', 'Siemens', 70.00,10);
+
+INSERT INTO SERVICIO_MATERIAL VALUES
+(1, 1, 10, 100.00),
+(2, 2, 5, 80.00),
+(3, 3, 2, 50.00),
+(4, 4, 3, 60.00),
+(5, 5, 4, 70.00),
+(6, 6, 8, 200.00),
+(7, 7, 6, 90.00),
+(8, 8, 7, 150.00),
+(9, 9, 5, 120.00),
+(10, 10, 9, 110.00);
+
+INSERT INTO PROVEEDOR VALUES
+(1, 'Carrier', 'carrier@mail.com', '1112223334', 'Disponible'),
+(2, 'YORK', 'york@mail.com', '2223334445', 'Disponible'),
+(3, 'PARKER', 'parker@mail.com', '3334445556', 'No Disponible'),
+(4, 'Bitzer', 'blitzer@mail.com', '4445556667', 'Disponible'),
+(5, 'MYCOM', 'mycom@mail.com', '5556667778', 'Disponible'),
+(6, 'Vilter', 'Vilter@mail.com', '6667778889', 'No Disponible'),
+(7, 'HANSES-TECNOLOGIES', 'hansen_tech@mail.com', '7778889990', 'Disponible'),
+(8, 'COPELAND', 'copeland@mail.com', '8889990001', 'Disponible'),
+(9, 'North Star', 'north_star@mail.com', '9990001112', 'No Disponible'),
+(10, 'Cool Tech', 'cool_tech@mail.com', '0001112223', 'Disponible');
+
+INSERT INTO INVENTARIO_PROVEEDOR VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
