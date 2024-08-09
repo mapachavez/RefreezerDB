@@ -20,7 +20,7 @@ def conectar():
         return None
     
 def gestionClientes(conexion):
-    opc = "0"
+    opc = ""
     while (opc != "5"):
         cursor = conexion.cursor()
         print("\n1. Insertar datos")
@@ -32,6 +32,7 @@ def gestionClientes(conexion):
         opc = input("\nIntroduce el número de opción: ")
         
         if opc == "1":
+            print("\n------\t Insertar nuevos clientes \t------")
             try:
                 conexion.start_transaction()
                 
@@ -79,7 +80,7 @@ def gestionClientes(conexion):
                 conexion.rollback()
             finally:
                 cursor.close()
-        if opc == "2":
+        elif opc == "2":
             ocon = ""
             while ocon != "3":
                 print("\n------\t Consulta de clientes \t------")
@@ -125,7 +126,8 @@ def gestionClientes(conexion):
                     ocon = ""
                     
             cursor.close()
-        if opc == "3":
+        elif opc == "3":
+            print("\n------\t Modificar datos de clientes \t------")
             while True:
                 print("\nSeleccione el tipo de cliente:")
                 print("1. Cliente Natural")
@@ -220,6 +222,53 @@ def gestionClientes(conexion):
             conexion.commit()
             cursor.close()
             input("Aplicando cambios... \nPulse enter para continuar...")
+        elif opc == "4":
+            print("\n------\t Eliminar datos de clientes \t------")
+            while True:
+                print("\nSeleccione el tipo de cliente:")
+                print("1. Cliente Natural")
+                print("2. Cliente Empresa")
+                
+                tipo_cliente = input("\nIngrese el número correspondiente al tipo de cliente: ")
+                
+                if tipo_cliente in ['1', '2']:
+                    break
+                else:
+                    print("Selección inválida. Por favor, intente de nuevo.")
+            
+            id_cliente = input("Ingrese el ID del cliente: ")
+
+            # Determinar la tabla específica según el tipo de cliente
+            if tipo_cliente == '1':
+                tabla_especifica = "CLIENTE_NATURAL"
+            elif tipo_cliente == '2':
+                tabla_especifica = "CLIENTE_EMPRESA"
+
+            try:
+                # Eliminar primero de la tabla específica
+                consulta_especifica = f"DELETE FROM {tabla_especifica} WHERE ID_cliente = %s"
+                cursor.execute(consulta_especifica, (id_cliente,))
+                
+                # Luego eliminar de la tabla CLIENTE
+                consulta_cliente = "DELETE FROM CLIENTE WHERE ID_cliente = %s"
+                cursor.execute(consulta_cliente, (id_cliente,))
+                
+                print(f"Cliente con ID {id_cliente} eliminado correctamente de las tablas CLIENTE y {tabla_especifica}.")
+
+            except mysql.connector.Error as err:
+                print(f"Error: {err}")
+                
+            #Aplicar los cambios
+            conexion.commit()
+            cursor.close()
+            input("Aplicando cambios... \nPulse enter para continuar...")
+        elif opc == "5":
+            cursor.close()
+            input("\nRegresando al menú principal... \nPresione enter para continuar...")
+        else:
+            input("\nOpcion no válida. Intente nuevamente...")
+            opc = ""
+            cursor.close()    
 # ----------------- MAIN ------------------ #
 
 conexion = conectar() 
