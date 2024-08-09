@@ -136,3 +136,28 @@ CREATE TABLE MATERIAL (
      ID_Inventario INT NOT NULL,
     FOREIGN KEY (ID_Inventario) REFERENCES INVENTARIO(ID_Inventario)
 );
+CREATE TABLE SERVICIO_MATERIAL (
+    ID_Servicio INT,
+    ID_Material INT,
+    cantidad_usada INT NOT NULL,
+    precio_unidad DECIMAL(10, 2) CHECK(precio_unidad >= 0) NOT NULL,
+    PRIMARY KEY (ID_Servicio, ID_Material),
+    FOREIGN KEY (ID_Servicio) REFERENCES SERVICIO(ID_Servicio),
+    FOREIGN KEY (ID_Material) REFERENCES MATERIAL(ID_Material)
+);
+
+CREATE TABLE PROVEEDOR (
+    ID_Proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20) NOT NULL,
+    disponibilidad VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE INVENTARIO_PROVEEDOR (
+    ID_Inventario INT,
+    ID_Proveedor INT,
+    PRIMARY KEY (ID_Inventario, ID_Proveedor),
+    FOREIGN KEY (ID_Inventario) REFERENCES INVENTARIO(ID_Inventario),
+    FOREIGN KEY (ID_Proveedor) REFERENCES PROVEEDOR(ID_Proveedor)
+);
