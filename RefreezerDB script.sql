@@ -41,7 +41,7 @@ CREATE TABLE PROFORMA (
     visita_fecha DATE NOT NULL,
     visita_hora TIME NOT NULL,
     visita_observacion TEXT,
-    ID_Proyecto INT NOT NULL,
+    ID_Proyecto INT,
     ID_Cliente INT NOT NULL,
     FOREIGN KEY (ID_Proyecto) REFERENCES PROYECTO(ID_Proyecto),
     FOREIGN KEY (ID_Cliente) REFERENCES CLIENTE(ID_Cliente)
