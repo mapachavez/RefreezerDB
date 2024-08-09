@@ -186,3 +186,135 @@ INSERT INTO CLIENTE_EMPRESA VALUES
 (2, '0923456789001'),
 (6, '0967890123001'),
 (9, '0990123456001');
+
+INSERT INTO PROYECTO VALUES
+(1, 'Instalación de Cámara Frigorífica', '2023-01-10', '2023-02-10'),
+(2, 'Mantenimiento de Sistemas de Refrigeración', '2023-03-15', '2023-04-15'),
+(3, 'Instalación de Aire Acondicionado', '2023-05-20', '2023-06-20'),
+(4, 'Reparación de Unidad de Aire', '2023-07-25', '2023-08-25'),
+(5, 'Revisión de Sistemas de Enfriamiento', '2023-09-30', '2023-10-30'),
+(6, 'Instalación de Enfriadores Industriales', '2023-11-05', '2023-12-05'),
+(7, 'Mantenimiento de Aires Acondicionados', '2024-01-10', '2024-02-10'),
+(8, 'Instalación de Unidad de Refrigeración', '2024-03-15', '2024-04-15'),
+(9, 'Optimización de Sistemas de Enfriamiento', '2024-05-20', '2024-06-20'),
+(10, 'Revisión de Equipos de Refrigeración', '2024-07-25', '2024-08-25');
+
+INSERT INTO PROFORMA VALUES
+(1, '2023-01-01', 500.00, 1500.00, 'Aprobado', 'Calle 1', 'Mz5', 'Guayaquil', '2023-01-10', '10:00:00', 'Ninguna', 1, 1),
+(2, '2023-02-01', 300.00, 1200.00, 'No Aprobado', 'Av. Central', 'Mz2', 'Quito', '2023-03-15', '11:00:00', 'Ninguna', 2, 2),
+(3, '2023-03-01', 400.00, 1300.00, 'Aprobado', 'Calle 5', 'Mz18', 'Cuenca', '2023-05-20', '12:00:00', 'Ninguna', 3, 3),
+(4, '2023-04-01', 350.00, 1400.00, 'No Aprobado', 'Av. Principal', 'Mz6', 'Loja', '2023-07-25', '13:00:00', 'Ninguna', 4, 4),
+(5, '2023-05-01', 450.00, 1600.00, 'Aprobado', 'Calle 8', 'Mz1', 'Manta', '2023-09-30', '14:00:00', 'Ninguna', 5, 5),
+(6, '2023-06-01', 500.00, 1700.00, 'No Aprobado', 'Zona Comercial', 'Mz10', 'Portoviejo', '2023-11-05', '15:00:00', 'Ninguna', 6, 6),
+(7, '2023-07-01', 600.00, 1800.00, 'Aprobado', 'Av. Secundaria', 'Mz6', 'Esmeraldas', '2024-01-10', '16:00:00', 'Ninguna', 7, 7),
+(8, '2023-08-01', 550.00, 1900.00, 'No Aprobado', 'Calle 2', 'Mz2', 'Ambato', '2024-03-15', '17:00:00', 'Ninguna', 8, 8),
+(9, '2023-09-01', 650.00, 2000.00, 'Aprobado', 'Parque Industrial', 'Mz4', 'Machala', '2024-05-20', '18:00:00', 'Ninguna', 9, 9),
+(10, '2023-10-01', 700.00, 2100.00, 'No Aprobado', 'Calle 3', 'Mz3', 'Latacunga', '2024-07-25', '19:00:00', 'Ninguna', 10, 10);
+
+INSERT INTO SERVICIO VALUES
+(1, 'Instalación de Cámara Frigorífica', 2000.00, 'Terminado', 12, '2023-01-10', '2023-02-10', 1),
+(2, 'Mantenimiento de Sistemas de Refrigeración', 1500.00, 'En Progreso', 6, '2023-03-15', '2023-04-15', 2),
+(3, 'Instalación de Aire Acondicionado', 1800.00, 'Terminado', 12, '2023-05-20', '2023-06-20', 3),
+(4, 'Reparación de Unidad de Aire', 1600.00, 'En Progreso', 6, '2023-07-25', '2023-08-25', 4),
+(5, 'Revisión de Sistemas de Enfriamiento', 1700.00, 'Terminado', 12, '2023-09-30', '2023-10-30', 5),
+(6, 'Instalación de Enfriadores Industriales', 2200.00, 'En Progreso', 6, '2023-11-05', '2023-12-05', 6),
+(7, 'Mantenimiento de Aires Acondicionados', 1900.00, 'Terminado', 12, '2024-01-10', '2024-02-10', 7),
+(8, 'Instalación de Unidad de Refrigeración', 2100.00, 'En Progreso', 6, '2024-03-15', '2024-04-15', 8),
+(9, 'Optimización de Sistemas de Enfriamiento', 2300.00, 'Terminado', 12, '2024-05-20', '2024-06-20', 9),
+(10, 'Revisión de Equipos de Refrigeración', 2400.00, 'En Progreso', 6, '2024-07-25', '2024-08-25', 10);
+
+INSERT INTO EMPLEADO VALUES
+(1, 'Pedro Jiménez', 'Técnico', 'pedro.j@refreezrec.com'),
+(2, 'Lucía Morales', 'Ingeniera', 'lucia.m@refreezrec.com'),
+(3, 'Miguel Ángel', 'Supervisor', 'miguel.a@refreezrec.com'),
+(4, 'Claudia Ruiz', 'Administradora', 'claudia.r@refreezrec.com'),
+(5, 'Ricardo Díaz', 'Técnico', 'ricardo.d@refreezrec.com'),
+(6, 'Elena Torres', 'Ventas', 'elena.t@refreezrec.com'),
+(7, 'Fernando Gómez', 'Mantenimiento', 'fernando.g@refreezrec.com'),
+(8, 'Sofía Herrera', 'Ingeniera', 'sofia.h@refreezrec.com'),
+(9, 'David Vargas', 'Técnico', 'david.v@refreezrec.com'),
+(10, 'Laura Mendoza', 'Recepcionista', 'laura.m@refreezrec.com');
+
+INSERT INTO EMPLEADO_SERVICIO VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+INSERT INTO CERTIFICADO VALUES
+(1, 'Certificado de Refrigeración', '2025-12-31', 'Pedro Jiménez',1),
+(2, 'Certificado de Instalación de Aires Acondicionados', '2024-11-30', 'Lucía Morales',2),
+(3, 'Certificado de Mantenimiento Industrial', '2026-10-29', 'Miguel Ángel',3),
+(4, 'Certificado de Gestión Administrativa', '2025-09-28', 'Claudia Ruiz',4),
+(5, 'Certificado de Seguridad en el Trabajo', '2024-08-27', 'Ricardo Díaz',5),
+(6, 'Certificado de Ventas y Atención al Cliente', '2024-09-26', 'Elena Torres',6),
+(7, 'Certificado de Mantenimiento Preventivo', '2026-06-25', 'Fernando Gómez',7),
+(8, 'Certificado de Ingeniería en Refrigeración', '2025-05-24', 'Sofía Herrera',8),
+(9, 'Certificado de Técnico en Aires Acondicionados', '2025-04-23', 'David Vargas',9),
+(10, 'Certificado de Atención al Cliente', '2025-03-22', 'Laura Mendoza',10);
+
+INSERT INTO EMPLEADO_CERTIFICADO VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+INSERT INTO SERVICIO_TECNICO VALUES
+(1, 'Instalación'),
+(2, 'Mantenimiento'),
+(3, 'Instalación'),
+(4, 'Reparación'),
+(5, 'Revisión'),
+(6, 'Instalación'),
+(7, 'Mantenimiento'),
+(8, 'Instalación'),
+(9, 'Optimización'),
+(10, 'Revisión');
+
+INSERT INTO DISEÑO_Y_FABRICACION VALUES
+(1, 'Diseño de Cámara Frigorífica', 'Industrial'),
+(2, 'Mantenimiento de Sistemas', 'Industrial'),
+(3, 'Diseño de Aire Acondicionado', 'Residencial'),
+(4, 'Reparación de Unidad', 'Residencial'),
+(5, 'Revisión de Sistemas', 'Industrial'),
+(6, 'Diseño de Enfriadores', 'Industrial'),
+(7, 'Mantenimiento de Aires', 'Residencial'),
+(8, 'Diseño de Unidad de Refrigeración', 'Industrial'),
+(9, 'Optimización de Sistemas', 'Industrial'),
+(10, 'Revisión de Equipos', 'Industrial');
+
+INSERT INTO MANTENIMIENTO VALUES
+(1, 'Preventivo', 'Cámara Frigorífica'),
+(2, 'Correctivo', 'Sistema de Refrigeración'),
+(3, 'Preventivo', 'Aire Acondicionado'),
+(4, 'Correctivo', 'Unidad de Aire'),
+(5, 'Preventivo', 'Sistema de Enfriamiento'),
+(6, 'Correctivo', 'Enfriadores Industriales'),
+(7, 'Preventivo', 'Aires Acondicionados'),
+(8, 'Correctivo', 'Unidad de Refrigeración'),
+(9, 'Preventivo', 'Sistema de Enfriamiento'),
+(10, 'Correctivo', 'Equipos de Refrigeración');
+
+INSERT INTO INSTALACION_Y_MONTAJE VALUES
+(1, 'Instalación de Cámara Frigorífica'),
+(2, 'Instalación de Sistemas de Refrigeración'),
+(3, 'Instalación de Aire Acondicionado'),
+(4, 'Reparación de Unidad de Aire'),
+(5, 'Instalación de Sistemas de Enfriamiento'),
+(6, 'Instalación de Enfriadores Industriales'),
+(7, 'Instalación de Aires Acondicionados'),
+(8, 'Instalación de Unidad de Refrigeración'),
+(9, 'Optimización de Sistemas de Enfriamiento'),
+(10, 'Revisión de Equipos de Refrigeración');
