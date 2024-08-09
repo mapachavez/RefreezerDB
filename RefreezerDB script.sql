@@ -161,3 +161,28 @@ CREATE TABLE INVENTARIO_PROVEEDOR (
     FOREIGN KEY (ID_Inventario) REFERENCES INVENTARIO(ID_Inventario),
     FOREIGN KEY (ID_Proveedor) REFERENCES PROVEEDOR(ID_Proveedor)
 );
+INSERT INTO CLIENTE VALUES
+(1, 'Coca Cola', 'Calle 1, Zona Industrial', 'contacto@abc.com', '1234567890'),
+(2, 'Fiber Home', 'Av. Central, Edificio XYZ', 'info@xyz.com', '0987654321'),
+(3, 'Carlos Pérez', 'Calle 5, Edificio 3', 'c.perez@mail.com', '0922334455'),
+(4, 'María García', 'Av. Principal, Casa 10', 'm.garcia@mail.com', '0933445566'),
+(5, 'Juan Rodríguez', 'Calle 8, Casa 14', 'juan.r@mail.com', '0944556677'),
+(6, 'Comercial Juanita', 'Zona Comercial, Local 5', 'ventas@lmn.com', '4455667788'),
+(7, 'José Fernández', 'Av. Secundaria, Edificio 2', 'jose.fernandez@mail.com', '0966778899'),
+(8, 'Ana López', 'Calle 2, Casa 6', 'ana.lopez@mail.com', '0977889900'),
+(9, 'Telconet', 'Parque Industrial, N° 7', 'servicios@pqr.com', '7788990011'),
+(10, 'Luisa Ramírez', 'Calle 3, Edificio 8', 'l.ramirez@mail.com', '0999001122');
+
+INSERT INTO CLIENTE_NATURAL VALUES
+(3, '0934567890'),
+(4, '0945678901'),
+(5, '0256789012'),
+(7, '1167890123'),
+(8, '2478901234'),
+(10,'0989012345');
+
+INSERT INTO CLIENTE_EMPRESA VALUES
+(1, '0912345678001'),
+(2, '0923456789001'),
+(6, '0967890123001'),
+(9, '0990123456001');
