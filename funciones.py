@@ -249,7 +249,7 @@ def gestionClientes(conexion):
             opc = ""
             cursor.close()
 
-            def gestionProformas(conexion):
+def gestionProformas(conexion):
     cursor = conexion.cursor()
 
     while True:
@@ -410,7 +410,7 @@ def gestionClientes(conexion):
             print("Opción no válida. Intente de nuevo.")
 
     cursor.close()
-    
+
 def gestionCertificado(conexion):
     cursor = conexion.cursor()
 
