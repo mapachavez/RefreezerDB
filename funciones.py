@@ -1,3 +1,74 @@
+def gestionCertificado(conexion):
+    cursor = conexion.cursor()
+
+    while True:
+        print("\n--- Gestión de Certificados ---")
+        print("1. Añadir nuevo Certificado")
+        print("2. Consultar Certificados")
+        print("3. Editar Certificado")
+        print("4. Eliminar Certificado")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            # Añadir nuevo certificado
+            descripcion = input("Ingrese la descripción del certificado: ")
+            fecha_vigencia = input("Ingrese la fecha de vigencia (YYYY-MM-DD): ")
+            nombre = input("Ingrese el nombre del certificado: ")
+            id_empleado = input("Ingrese el ID del empleado: ")
+
+            query = """
+            INSERT INTO certificado (descripcion, fecha_vigencia, nombre, ID_Empleado)
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(query, (descripcion, fecha_vigencia, nombre, id_empleado))
+            conexion.commit()
+            print("Certificado añadido exitosamente.")
+
+        elif opcion == '2':
+            # Consultar certificados
+            query = "SELECT * FROM certificado"
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+
+            if resultados:
+                print("\n--- Certificados ---")
+                for fila in resultados:
+                    id_certificado = fila[0]
+                    descripcion = fila[1]
+                    fecha_vigencia = fila[2]
+                    nombre = fila[3]
+                    id_empleado = fila[4]
+                    print(f"ID: {id_certificado} | Descripción: {descripcion} | Fecha de Vigencia: {fecha_vigencia} | Nombre: {nombre} | ID Empleado: {id_empleado}")
+            else:
+                print("No se encontraron certificados.")
+
+        elif opcion == '3':
+            # Editar certificado
+            id_certificado = input("Ingrese el ID del certificado que desea editar: ")
+            nueva_descripcion = input("Ingrese la nueva descripción: ")
+            query = "UPDATE certificado SET descripcion = %s WHERE ID_Certificado = %s"
+            cursor.execute(query, (nueva_descripcion, id_certificado))
+            conexion.commit()
+            print("Certificado actualizado exitosamente.")
+
+        elif opcion == '4':
+            # Eliminar certificado
+            id_certificado = input("Ingrese el ID del certificado que desea eliminar: ")
+            query = "DELETE FROM certificado WHERE ID_Certificado = %s"
+            cursor.execute(query, (id_certificado,))
+            conexion.commit()
+            print("Certificado eliminado exitosamente.")
+
+        elif opcion == '5':
+            # Salir
+            print("Saliendo del sistema de gestión de certificados...")
+            break
+        else:
+            print("Opción inválida...")
+
+    cursor.close()
+
 def gestionproyecto(conexion):
     cursor = conexion.cursor()
 
