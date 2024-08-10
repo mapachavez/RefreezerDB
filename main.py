@@ -6,9 +6,9 @@ def conectar():
     try:
         conexion = mysql.connector.connect(
             host='localhost', # Cambiar por la dirección de tu servidor
-            port = 3306, # Cambiar por el puerto de tu servidor
+            port = 9999, # Cambiar por el puerto de tu servidor
             user='root',   # Cambiar por tu nombre de usuario
-            password='55M@pita55',  # Cambiar por tu contraseña
+            password='lol',  # Cambiar por tu contraseña
             database='refreezerdb'
             )
         
@@ -545,8 +545,7 @@ while(opc != "10"):
         gestionProformas(conexion)
         
     elif (opc == "3"):
-        print("\nOpcion 3")
-        input("Presione enter para continunar...\n")
+        fu.gestionproyecto(conexion)
     elif (opc == "4"):
         print("\nOpcion 4")
         input("Presione enter para continunar...\n")

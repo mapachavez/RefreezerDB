@@ -1,3 +1,90 @@
+def gestionproyecto(conexion):
+    cursor = conexion.cursor()
+
+    while True:
+        print("\n--- Gestión de Proyectos ---")
+        print("1. Añadir nuevo Proyecto")
+        print("2. Consultar proyectos")
+        print("3. Editar proyecto")
+        print("4. Eliminar proyecto")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            # Añadir un nuevo proyecto
+            nombre = input("Ingrese el nombre del proyecto: ")
+            fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
+            fecha_fin = input("Ingrese la fecha de finalización (YYYY-MM-DD): ")
+            
+            query = """
+            INSERT INTO proyecto (nombre, fecha_inicio, fecha_fin)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, (nombre, fecha_inicio, fecha_fin))
+            conexion.commit()
+            input("Proyecto añadido exitosamente.")
+        
+        elif opcion == '2':
+            # Mostrar los proyectos
+            query = "SELECT * FROM proyecto"
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+
+            if resultados:
+                print("\n--- Proyectos Creados ---")
+                for fila in resultados:
+                    id_proyecto = fila[0]
+                    nombre = fila[1]
+                    fecha_inicio = fila[2].strftime("%Y-%m-%d")
+                    fecha_fin = fila[3].strftime("%Y-%m-%d")
+                    
+                    print(f"ID: {id_proyecto} | Nombre: {nombre} "
+                          f"Fecha de Inicio: {fecha_inicio} | Fecha de Fin: {fecha_fin}\n")
+                input("Consulta realizada correctamente...")
+            else:
+                print("No se encontraron proyectos.")
+        
+        elif opcion == '3':
+            id_proyecto = input("Ingrese el ID del proyecto que desea editar: ")
+            print("Seleccione el campo que desea editar:")
+            print("1. Nombre del Proyecto")
+            print("2. Fecha de Inicio")
+            print("3. Fecha de Fin")
+            campo = input("Opción: ")
+
+            if campo == '1':
+                nuevo_valor = input("Ingrese el nuevo nombre del proyecto: ")
+                query = "UPDATE proyecto SET nombre = %s WHERE ID_Proyecto = %s"
+            elif campo == '2':
+                nuevo_valor = input("Ingrese la nueva fecha de inicio (YYYY-MM-DD): ")
+                query = "UPDATE proyecto SET fecha_inicio = %s WHERE ID_Proyecto = %s"
+            elif campo == '3':
+                nuevo_valor = input("Ingrese la nueva fecha de fin (YYYY-MM-DD): ")
+                query = "UPDATE proyecto SET fecha_fin = %s WHERE ID_Proyecto = %s"
+            else:
+                print("Opción incorrecta...")
+                continue
+
+            cursor.execute(query, (nuevo_valor, id_proyecto))
+            conexion.commit()
+            input("Proyecto actualizado exitosamente...")
+        
+        elif opcion == '4':
+            # Eliminar el proyecto 
+            id_proyecto = input("Ingrese el ID del proyecto que desea eliminar: ")
+            query = "DELETE FROM proyecto WHERE ID_Proyecto = %s"
+            cursor.execute(query, (id_proyecto,))
+            conexion.commit()
+            input("El proyecto se ha eliminado exitosamente...")
+        
+        elif opcion == '5':
+            # Salir
+            input("Saliendo del sistema de gestión de proyectos...")
+            break
+        else: 
+            print("Opción inválida...")
+    
+    cursor.close()
 
 def gestionempleados(conexion):
     cursor = conexion.cursor()
