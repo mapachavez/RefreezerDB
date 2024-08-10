@@ -553,8 +553,7 @@ while(opc != "10"):
         print("\n-----\t Gestión de empleados \t-----")
         fu.gestionempleados(conexion)
     elif (opc == "6"):
-        print("\nOpcion 6")
-        input("Presione enter para continunar...\n")
+        fu.gestionCertificado(conexion)
     elif (opc == "7"):
         print("\nOpcion 7")
         input("Presione enter para continunar...\n")
