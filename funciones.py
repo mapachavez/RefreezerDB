@@ -246,3 +246,78 @@ def gestionempleados(conexion):
 
     cursor.close()
 
+def gestion_proveedor(conexion):
+    """
+    Función para gestionar las operaciones CRUD en la tabla 'proveedor'.
+
+    Args:
+        conexion: Conexión a la base de datos.
+    """
+
+    cursor = conexion.cursor()
+
+    while True:
+        print("\n--- Gestión de Proveedores ---")
+        print("1. Añadir nuevo Proveedor")
+        print("2. Consultar Proveedores")
+        print("3. Editar Proveedor")
+        print("4. Eliminar Proveedor")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            # Añadir un nuevo proveedor
+            nombre = input("Ingrese el nombre del proveedor: ")
+            correo = input("Ingrese el correo electrónico: ")
+            telefono = input("Ingrese el número de teléfono: ")
+            disponibilidad = input("Ingrese la disponibilidad: ")
+
+            query = """
+            INSERT INTO proveedor (nombre, correo, telefono, disponibilidad)
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(query, (nombre, correo, telefono, disponibilidad))
+            conexion.commit()
+            print("Proveedor añadido exitosamente.")
+
+        elif opcion == '2':
+            # Consultar proveedores
+            query = "SELECT * FROM proveedor"
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+
+            if resultados:
+                print("\n--- Proveedores ---")
+                for fila in resultados:
+                    id_proveedor, nombre, correo, telefono, disponibilidad = fila
+                    print(f"ID: {id_proveedor} | Nombre: {nombre} | Correo: {correo} | Teléfono: {telefono} | Disponibilidad: {disponibilidad}")
+            else:
+                print("No se encontraron proveedores.")
+
+        elif opcion == '3':
+            # Editar proveedor
+            id_proveedor = input("Ingrese el ID del proveedor a editar: ")
+            campo = input("Seleccione el campo a editar (nombre, correo, telefono, disponibilidad): ")
+            nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
+
+            query = f"UPDATE proveedor SET {campo} = %s WHERE ID = %s"
+            cursor.execute(query, (nuevo_valor, id_proveedor))
+            conexion.commit()
+            print("Proveedor actualizado exitosamente.")
+
+        elif opcion == '4':
+            # Eliminar proveedor
+            id_proveedor = input("Ingrese el ID del proveedor a eliminar: ")
+            query = "DELETE FROM proveedor WHERE ID = %s"
+            cursor.execute(query, (id_proveedor,))
+            conexion.commit()
+            print("Proveedor eliminado exitosamente.")
+
+        elif opcion == '5':
+            # Salir
+            print("Saliendo del sistema de gestión de proveedores...")
+            break
+        else:
+            print("Opción inválida.")
+
+    cursor.close()
