@@ -1,13 +1,14 @@
 # --------------- LIBRERIAS --------------- #
 import mysql.connector
+import funciones as fu
 # --------------- FUNCIONES --------------- #
 def conectar():
     try:
         conexion = mysql.connector.connect(
             host='localhost', # Cambiar por la dirección de tu servidor
-            port = 9999, # Cambiar por el puerto de tu servidor
-            user='user',   # Cambiar por tu nombre de usuario
-            password='password',  # Cambiar por tu contraseña
+            port = 3306, # Cambiar por el puerto de tu servidor
+            user='root',   # Cambiar por tu nombre de usuario
+            password='55M@pita55',  # Cambiar por tu contraseña
             database='refreezerdb'
             )
         
@@ -550,8 +551,8 @@ while(opc != "10"):
         print("\nOpcion 4")
         input("Presione enter para continunar...\n")
     elif (opc == "5"):
-        print("\nOpcion 5")
-        input("Presione enter para continunar...\n")
+        print("\n-----\t Gestión de empleados \t-----")
+        fu.gestionempleados(conexion)
     elif (opc == "6"):
         print("\nOpcion 6")
         input("Presione enter para continunar...\n")
