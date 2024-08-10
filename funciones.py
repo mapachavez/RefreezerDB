@@ -246,6 +246,76 @@ def gestionempleados(conexion):
 
     cursor.close()
 
+def gestion_inventario(conexion):
+
+    cursor = conexion.cursor()
+
+    while True:
+        print("\n--- Gestión de Inventario ---")
+        print("1. Añadir nuevo producto")
+        print("2. Consultar productos")
+        print("3. Editar producto")
+        print("4. Eliminar producto")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            # Add a new product
+            stock = int(input("Ingrese la cantidad en stock: "))
+            nombre = input("Ingrese el nombre del producto: ")
+            marca = input("Ingrese la marca: ")
+            precio_unidad = float(input("Ingrese el precio unitario: "))
+
+            query = """
+            INSERT INTO inventario (stock, nombre, marca, precio_unidad)
+            VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(query, (stock, nombre, marca, precio_unidad))
+            conexion.commit()
+            print("Producto añadido exitosamente.")
+
+        elif opcion == '2':
+            # Show products
+            query = "SELECT * FROM inventario"
+            cursor.execute(query)
+            resultados = cursor.fetchall()
+
+            if resultados:
+                print("\n--- Productos ---")
+                for fila in resultados:
+                    id_inventario, stock, nombre, marca, precio_unidad = fila
+                    print(f"ID: {id_inventario} | Stock: {stock} | Nombre: {nombre} | Marca: {marca} | Precio: {precio_unidad}")
+            else:
+                print("No se encontraron productos.")
+
+        elif opcion == '3':
+            # Edit product
+            id_inventario = int(input("Ingrese el ID del producto a editar: "))
+            campo = input("Seleccione el campo a editar (stock, nombre, marca, precio_unidad): ")
+            nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
+
+            query = f"UPDATE inventario SET {campo} = %s WHERE ID_Inventario = %s"
+            cursor.execute(query, (nuevo_valor, id_inventario))
+            conexion.commit()
+            print("Producto actualizado exitosamente.")
+
+        elif opcion == '4':
+            # Delete product
+            id_inventario = int(input("Ingrese el ID del producto a eliminar: "))
+            query = "DELETE FROM inventario WHERE ID_Inventario = %s"
+            cursor.execute(query, (id_inventario,))
+            conexion.commit()
+            print("Producto eliminado exitosamente.")
+
+        elif opcion == '5':
+            # Exit
+            print("Saliendo del sistema de gestión de inventario...")
+            break
+        else:
+            print("Opción inválida.")
+
+    cursor.close()
+
 def gestion_proveedor(conexion):
     """
     Función para gestionar las operaciones CRUD en la tabla 'proveedor'.
