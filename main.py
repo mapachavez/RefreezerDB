@@ -132,7 +132,7 @@ while(opc != "10"):
         fu.gestionClientes(conexion)
     
     elif (opc == "2"):
-        gestionProformas(conexion)
+        fu.gestionProformas(conexion)
         
     elif (opc == "3"):
         fu.gestionproyecto(conexion)
