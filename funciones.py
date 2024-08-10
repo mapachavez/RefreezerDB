@@ -673,18 +673,58 @@ def gestionMateriales(conexion):
 
         if opcion == '1':
             # Añadir un nuevo material
-            descripcion = input("Ingrese la descripción del material: ")
-            marca = input("Ingrese la marca del material: ")
-            precio_unidad = float(input("Ingrese el precio por unidad del material: "))
-            id_inventario = input("Ingrese el ID del inventario asociado: ")
+            nombre_material = input("Ingrese el nombre del material: ")
 
-            query = """
-            INSERT INTO material (descripcion, marca, precio_unidad, ID_Inventario)
-            VALUES (%s, %s, %s, %s)
-            """
-            cursor.execute(query, (descripcion, marca, precio_unidad, id_inventario))
-            conexion.commit()
-            input("Material añadido exitosamente. Stock actualizado.")
+            # Verificar si el material ya existe en la tabla inventario
+            query_check_material = "SELECT ID_Inventario, marca, precio_unidad FROM inventario WHERE nombre = %s"
+            cursor.execute(query_check_material, (nombre_material,))
+            material_existente = cursor.fetchone()
+
+            if material_existente:
+                # Si el material existe, se asignan los datos automáticamente
+                id_inventario = material_existente[0]
+                marca = material_existente[1]
+                precio_unidad = material_existente[2]
+
+                # Sumar +1 al stock en la tabla inventario
+                query_update_stock = "UPDATE inventario SET Stock = Stock + 1 WHERE ID_Inventario = %s"
+                cursor.execute(query_update_stock, (id_inventario,))
+                conexion.commit()
+
+                # Insertar el material en la tabla material
+                query_insert_material = """
+                INSERT INTO material (descripcion, marca, precio_unidad, ID_Inventario)
+                VALUES (%s, %s, %s, %s)
+                """
+                descripcion = input("Ingrese la descripción del material: ")
+                cursor.execute(query_insert_material, (descripcion, marca, precio_unidad, id_inventario))
+                conexion.commit()
+                input("Material añadido exitosamente con datos existentes en el inventario.")
+            else:
+                # Si el material no existe, se piden los datos y se crean los registros
+                descripcion = input("Ingrese la descripción del material: ")
+                marca = input("Ingrese la marca del material: ")
+                precio_unidad = input("Ingrese el precio por unidad del material: ")
+                
+                # Crear un nuevo registro en inventario
+                query_insert_inventario = """
+                INSERT INTO inventario (Stock, nombre, marca, precio_unidad)
+                VALUES (1, %s, %s, %s)
+                """
+                cursor.execute(query_insert_inventario, (nombre_material, marca, precio_unidad))
+                conexion.commit()
+                
+                # Obtener el ID_Inventario recién creado
+                id_inventario = cursor.lastrowid
+
+                # Insertar el material en la tabla material
+                query_insert_material = """
+                INSERT INTO material (descripcion, marca, precio_unidad, ID_Inventario)
+                VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(query_insert_material, (descripcion, marca, precio_unidad, id_inventario))
+                conexion.commit()
+                input("Material añadido exitosamente como nuevo inventario.")
 
         elif opcion == '2':
             # Mostrar los materiales
@@ -735,22 +775,29 @@ def gestionMateriales(conexion):
         elif opcion == '4':
             # Eliminar material
             id_material = input("Ingrese el ID del material que desea eliminar: ")
-            
-            # Obtener el ID_Inventario antes de eliminar el material
-            cursor.execute("SELECT ID_Inventario FROM material WHERE ID_Material = %s", (id_material,))
-            id_inventario = cursor.fetchone()[0]
-            
-            # Eliminar el material
-            query = "DELETE FROM material WHERE ID_Material = %s"
-            cursor.execute(query, (id_material,))
-            conexion.commit()
-            input("Material eliminado exitosamente.")
+            # Verificar si existen registros dependientes en servicio_material
+            query_check_dependents = "SELECT COUNT(*) FROM servicio_material WHERE ID_Material = %s"
+            cursor.execute(query_check_dependents, (id_material,))
+            dependientes = cursor.fetchone()[0]
 
-            # Restar 1 al Stock del inventario asociado
-            query_update_stock = "UPDATE inventario SET Stock = Stock - 1 WHERE ID_Inventario = %s"
-            cursor.execute(query_update_stock, (id_inventario,))
-            conexion.commit()
-            input("Stock actualizado.")
+            if dependientes > 0:
+                    input("No se puede eliminar el material porque hay registros dependientes en servicio_material.")
+            else:
+                    # Obtener el ID_Inventario antes de eliminar el material
+                    cursor.execute("SELECT ID_Inventario FROM material WHERE ID_Material = %s", (id_material,))
+                    id_inventario = cursor.fetchone()[0]
+
+                    # Eliminar el material
+                    query_delete_material = "DELETE FROM material WHERE ID_Material = %s"
+                    cursor.execute(query_delete_material, (id_material,))
+                    conexion.commit()
+                    input("Material eliminado exitosamente.")
+
+                    # Restar 1 al Stock del inventario asociado
+                    query_update_stock = "UPDATE inventario SET Stock = Stock - 1 WHERE ID_Inventario = %s"
+                    cursor.execute(query_update_stock, (id_inventario,))
+                    conexion.commit()
+                    input("Stock actualizado.")
 
         elif opcion == '5':
             input("Saliendo del sistema de gestión de materiales...")
