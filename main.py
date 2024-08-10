@@ -352,11 +352,9 @@ while(opc != "10"):
     elif (opc == "6"):
         fu.gestionCertificado(conexion)
     elif (opc == "7"):
-        print("\nOpcion 7")
-        input("Presione enter para continunar...\n")
+        fu.gestionMateriales(conexion)
     elif (opc == "8"):
-        print("\nOpcion 8")
-        input("Presione enter para continunar...\n")
+        fu.gestionInventario(conexion)
     elif (opc == "9"):
         fu.gestion_proveedor(conexion)
     elif (opc == "10"):
