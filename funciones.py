@@ -20,7 +20,7 @@ def gestionClientes(conexion):
                 mail = input("Introduzca el correo: ")
                 telf = input("Introduzca el telefono: ")
                 
-                query_c = "INSERT INTO cliente (nombre, direccion, correo, telefono) VALUES (%s, %s, %s, %s)"
+                query_c = "INSERT INTO CLIENTE (nombre, direccion, correo, telefono) VALUES (%s, %s, %s, %s)"
                 val_c = (nombre, direccion, mail, telf)
                 cursor.execute(query_c, val_c)
                 
@@ -37,12 +37,12 @@ def gestionClientes(conexion):
                     
                     if tipo == "1":
                         cedula = input("Ingrese el numero de cedula: ")
-                        query_cn = "INSERT INTO cliente_natural (ID_cliente, Cedula) VALUES (%s, %s)"
+                        query_cn = "INSERT INTO CLIENTE_NATURAL (ID_cliente, Cedula) VALUES (%s, %s)"
                         val_cn = (id_cliente, cedula)
                         cursor.execute(query_cn,val_cn)
                     elif tipo == "2":
                         ruc = input("Ingrese el ruc de la empresa: ")
-                        query_ce = "INSERT INTO cliente_empresa (ID_cliente, RUC) VALUES (%s, %s)"
+                        query_ce = "INSERT INTO CLIENTE_EMPRESA (ID_cliente, RUC) VALUES (%s, %s)"
                         val_ce = (id_cliente, ruc)
                         cursor.execute(query_ce,val_ce)
                     else:
@@ -70,7 +70,7 @@ def gestionClientes(conexion):
                 
                 if ocon == "1":
                     print("\n---------- \t\t Consulta de clientes naturales \t\t----------\n")
-                    query_ccn = "SELECT * FROM cliente c JOIN cliente_natural USING(ID_cliente)"
+                    query_ccn = "SELECT * FROM CLIENTE c JOIN CLIENTE_NATURAL USING(ID_cliente)"
                     
                     try:
                         cursor.execute(query_ccn)
@@ -85,7 +85,7 @@ def gestionClientes(conexion):
                         print(f"Error: {err}")
                 elif ocon == "2":
                     print("\n---------- \t\t Consulta de clientes empresa \t\t----------\n")
-                    query_cce = "SELECT * FROM cliente c JOIN cliente_empresa USING(ID_cliente)"
+                    query_cce = "SELECT * FROM CLIENTE c JOIN CLIENTE_EMPRESA USING(ID_cliente)"
                     
                     try:
                         cursor.execute(query_cce)
