@@ -974,6 +974,7 @@ def gestionMateriales(conexion):
             print("1. Descripción")
             print("2. Marca")
             print("3. Precio por Unidad")
+            print("4. cantidad de material")
             campo = input("Opción: ")
 
             if campo == '1':
@@ -985,6 +986,62 @@ def gestionMateriales(conexion):
             elif campo == '3':
                 nuevo_valor = float(input("Ingrese el nuevo precio por unidad: "))
                 query = "UPDATE material SET precio_unidad = %s WHERE ID_Material = %s"
+            elif campo == '4':
+                print("Seleccione la operación que desea realizar:")
+                print("1. Añadir cantidad")
+                print("2. Quitar cantidad")
+                operacion = input("Opción: ")
+
+                if operacion == '1':
+                    cantidad = int(input("Ingrese la cantidad a añadir: "))
+
+                    # Actualizar el stock en la tabla inventario
+                    query_update_stock = """
+                    UPDATE inventario 
+                    SET Stock = Stock + %s 
+                    WHERE ID_Inventario = (
+                        SELECT ID_Inventario 
+                        FROM material 
+                        WHERE ID_Material = %s
+                    )
+                    """
+                    cursor.execute(query_update_stock, (cantidad, id_material))
+                    conexion.commit()
+                    input("Cantidad añadida exitosamente al inventario.")
+
+                elif operacion == '2':
+                    cantidad = int(input("Ingrese la cantidad a quitar: "))
+
+                    # Verificar si hay suficiente stock antes de restar
+                    query_check_stock = """
+                    SELECT Stock 
+                    FROM inventario 
+                    WHERE ID_Inventario = (
+                        SELECT ID_Inventario 
+                        FROM material 
+                        WHERE ID_Material = %s
+                    )
+                    """
+                    cursor.execute(query_check_stock, (id_material,))
+                    stock_actual = cursor.fetchone()[0]
+
+                    if cantidad > stock_actual:
+                        input("Error: La cantidad a quitar excede el stock disponible.")
+                    else:
+                        # Actualizar el stock en la tabla inventario
+                        query_update_stock = """
+                        UPDATE inventario 
+                        SET Stock = Stock - %s 
+                        WHERE ID_Inventario = (
+                            SELECT ID_Inventario 
+                            FROM material 
+                            WHERE ID_Material = %s
+                        )
+                        """
+                        cursor.execute(query_update_stock, (cantidad, id_material))
+                        conexion.commit()
+                        input("Cantidad quitada exitosamente del inventario.")
+
             else:
                 print("Opción incorrecta...")
                 continue
