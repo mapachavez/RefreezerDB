@@ -1247,7 +1247,7 @@ def gestion_proveedor(conexion):
             campo = input("Seleccione el campo a editar (nombre, correo, telefono, disponibilidad): ")
             nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
 
-            query = f"UPDATE proveedor SET {campo} = %s WHERE ID = %s"
+            query = f"UPDATE proveedor SET {campo} = %s WHERE ID_Proveedor = %s"
             cursor.execute(query, (nuevo_valor, id_proveedor))
             conexion.commit()
             print("Proveedor actualizado exitosamente.")
@@ -1255,7 +1255,7 @@ def gestion_proveedor(conexion):
         elif opcion == '4':
             # Eliminar proveedor
             id_proveedor = input("Ingrese el ID del proveedor a eliminar: ")
-            query = "DELETE FROM proveedor WHERE ID = %s"
+            query = "DELETE FROM proveedor WHERE ID_Proveedor = %s"
             cursor.execute(query, (id_proveedor,))
             conexion.commit()
             print("Proveedor eliminado exitosamente.")
