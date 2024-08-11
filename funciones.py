@@ -587,7 +587,15 @@ def gestionServicios(conexion):
             # Añadir nuevo servicio
             descripcion = input("Ingrese la descripción del servicio: ")
             costo_servicio = input("Ingrese el costo del servicio: ")
-            estado = input("Ingrese el estado del servicio: ")
+
+            while True:
+                estado = input("Ingrese el estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
+                if estado == "":
+                    estado = "En progreso"
+                if estado in ["En progreso", "Terminado"]:
+                    break
+                print("Entrada no válida. Intente nuevamente.")
+
             garantia = input("Ingrese la garantía (en meses): ")
             fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
             fecha_fin = input("Ingrese la fecha de fin (YYYY-MM-DD): ")
@@ -731,7 +739,13 @@ def gestionServicios(conexion):
                 nuevo_valor = input("Ingrese el nuevo costo del servicio: ")
                 query = "UPDATE servicio SET costo_servicio = %s WHERE ID_Servicio = %s"
             elif campo == '3':
-                nuevo_valor = input("Ingrese el nuevo estado: ")
+                while True:
+                    nuevo_valor = input("Ingrese el nuevo estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
+                    if nuevo_valor == "":
+                        nuevo_valor = "En progreso"
+                    if nuevo_valor in ["En progreso", "Terminado"]:
+                        break
+                    print("Entrada no válida. Intente nuevamente.")
                 query = "UPDATE servicio SET estado = %s WHERE ID_Servicio = %s"
             elif campo == '4':
                 nuevo_valor = input("Ingrese la nueva garantía (en meses): ")
