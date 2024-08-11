@@ -286,7 +286,7 @@ def gestionProformas(conexion):
             id_proyecto = input("Ingrese el ID del proyecto (opcional): ")
 
             query = """
-            INSERT INTO proforma (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion, ID_Cliente, ID_Proyecto)
+            INSERT INTO PROFORMA (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion, ID_Cliente, ID_Proyecto)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(query, (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion, id_cliente, id_proyecto if id_proyecto else None))
@@ -295,7 +295,7 @@ def gestionProformas(conexion):
 
         elif opcion == '2':
             # Consultar proformas (mostrar todas)
-            query = "SELECT * FROM proforma"
+            query = "SELECT * FROM PROFORMA"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -345,13 +345,13 @@ def gestionProformas(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese la nueva fecha de emisión (YYYY-MM-DD): ")
-                query = "UPDATE proforma SET fecha_emision = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET fecha_emision = %s WHERE ID_Proforma = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese el nuevo costo de mano de obra: ")
-                query = "UPDATE proforma SET costo_mano_obra = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET costo_mano_obra = %s WHERE ID_Proforma = %s"
             elif campo == '3':
                 nuevo_valor = input("Ingrese el nuevo subtotal: ")
-                query = "UPDATE proforma SET subtotal = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET subtotal = %s WHERE ID_Proforma = %s"
             elif campo == '4':
                 while True:
                     nuevo_valor = input("Ingrese el nuevo estado de aprobación (Aprobado/No Aprobado) [Enter para 'No Aprobado']: ")
@@ -360,31 +360,31 @@ def gestionProformas(conexion):
                     if nuevo_valor in ["Aprobado", "No Aprobado"]:
                         break
                     print("Entrada no válida. Intente nuevamente.")
-                query = "UPDATE proforma SET estado_aprobacion = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET estado_aprobacion = %s WHERE ID_Proforma = %s"
             elif campo == '5':
                 nuevo_valor = input("Ingrese la nueva calle: ")
-                query = "UPDATE proforma SET calle = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET calle = %s WHERE ID_Proforma = %s"
             elif campo == '6':
                 nuevo_valor = input("Ingrese la nueva manzana: ")
-                query = "UPDATE proforma SET manzana = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET manzana = %s WHERE ID_Proforma = %s"
             elif campo == '7':
                 nuevo_valor = input("Ingrese la nueva ciudad: ")
-                query = "UPDATE proforma SET ciudad = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET ciudad = %s WHERE ID_Proforma = %s"
             elif campo == '8':
                 nuevo_valor = input("Ingrese la nueva fecha de visita (YYYY-MM-DD): ")
-                query = "UPDATE proforma SET visita_fecha = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET visita_fecha = %s WHERE ID_Proforma = %s"
             elif campo == '9':
                 nuevo_valor = input("Ingrese la nueva hora de visita (HH:MM:SS): ")
-                query = "UPDATE proforma SET visita_hora = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET visita_hora = %s WHERE ID_Proforma = %s"
             elif campo == '10':
                 nuevo_valor = input("Ingrese las nuevas observaciones de la visita: ")
-                query = "UPDATE proforma SET visita_observacion = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET visita_observacion = %s WHERE ID_Proforma = %s"
             elif campo == '11':
                 nuevo_valor = input("Ingrese el nuevo ID del cliente: ")
-                query = "UPDATE proforma SET ID_Cliente = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET ID_Cliente = %s WHERE ID_Proforma = %s"
             elif campo == '12':
                 nuevo_valor = input("Ingrese el nuevo ID del proyecto (puede dejarlo vacío): ")
-                query = "UPDATE proforma SET ID_Proyecto = %s WHERE ID_Proforma = %s"
+                query = "UPDATE PROFORMA SET ID_Proyecto = %s WHERE ID_Proforma = %s"
             else:
                 print("Opción no válida.")
                 continue
@@ -396,7 +396,7 @@ def gestionProformas(conexion):
         elif opcion == '4':
             # Eliminar proforma
             id_proforma = input("Ingrese el ID de la proforma que desea eliminar: ")
-            query = "DELETE FROM proforma WHERE ID_Proforma = %s"
+            query = "DELETE FROM PROFORMA WHERE ID_Proforma = %s"
             cursor.execute(query, (id_proforma,))
             conexion.commit()
             input("Proforma eliminada exitosamente...")
@@ -431,7 +431,7 @@ def gestionCertificado(conexion):
             id_empleado = input("Ingrese el ID del empleado: ")
 
             query = """
-            INSERT INTO certificado (descripcion, fecha_vigencia, nombre, ID_Empleado)
+            INSERT INTO CERTIFICADO (descripcion, fecha_vigencia, nombre, ID_Empleado)
             VALUES (%s, %s, %s, %s)
             """
             cursor.execute(query, (descripcion, fecha_vigencia, nombre, id_empleado))
@@ -440,7 +440,7 @@ def gestionCertificado(conexion):
 
         elif opcion == '2':
             # Consultar certificados
-            query = "SELECT * FROM certificado"
+            query = "SELECT * FROM CERTIFICADO"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -460,7 +460,7 @@ def gestionCertificado(conexion):
             # Editar certificado
             id_certificado = input("Ingrese el ID del certificado que desea editar: ")
             nueva_descripcion = input("Ingrese la nueva descripción: ")
-            query = "UPDATE certificado SET descripcion = %s WHERE ID_Certificado = %s"
+            query = "UPDATE CERTIFICADO SET descripcion = %s WHERE ID_Certificado = %s"
             cursor.execute(query, (nueva_descripcion, id_certificado))
             conexion.commit()
             print("Certificado actualizado exitosamente.")
@@ -468,7 +468,7 @@ def gestionCertificado(conexion):
         elif opcion == '4':
             # Eliminar certificado
             id_certificado = input("Ingrese el ID del certificado que desea eliminar: ")
-            query = "DELETE FROM certificado WHERE ID_Certificado = %s"
+            query = "DELETE FROM CERTIFICADO WHERE ID_Certificado = %s"
             cursor.execute(query, (id_certificado,))
             conexion.commit()
             print("Certificado eliminado exitosamente.")
@@ -511,7 +511,7 @@ def gestionproyecto(conexion):
                 fecha_fin = input("Ingrese la fecha de finalización (YYYY-MM-DD): ")
 
                 query = """
-                INSERT INTO proyecto (nombre, fecha_inicio, fecha_fin, ID_cliente)
+                INSERT INTO PROYECTO (nombre, fecha_inicio, fecha_fin, ID_cliente)
                 VALUES (%s, %s, %s, %s)
                 """
                 cursor.execute(query, (nombre, fecha_inicio, fecha_fin, id_cliente))
@@ -522,7 +522,7 @@ def gestionproyecto(conexion):
         
         elif opcion == '2':
             # Mostrar los proyectos
-            query = "SELECT * FROM proyecto"
+            query = "SELECT * FROM PROYECTO"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -550,13 +550,13 @@ def gestionproyecto(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese el nuevo nombre del proyecto: ")
-                query = "UPDATE proyecto SET nombre = %s WHERE ID_Proyecto = %s"
+                query = "UPDATE PROYECTO SET nombre = %s WHERE ID_Proyecto = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese la nueva fecha de inicio (YYYY-MM-DD): ")
-                query = "UPDATE proyecto SET fecha_inicio = %s WHERE ID_Proyecto = %s"
+                query = "UPDATE PROYECTO SET fecha_inicio = %s WHERE ID_Proyecto = %s"
             elif campo == '3':
                 nuevo_valor = input("Ingrese la nueva fecha de fin (YYYY-MM-DD): ")
-                query = "UPDATE proyecto SET fecha_fin = %s WHERE ID_Proyecto = %s"
+                query = "UPDATE PROYECTO SET fecha_fin = %s WHERE ID_Proyecto = %s"
             else:
                 print("Opción incorrecta...")
                 continue
@@ -568,7 +568,7 @@ def gestionproyecto(conexion):
         elif opcion == '4':
             # Eliminar el proyecto 
             id_proyecto = input("Ingrese el ID del proyecto que desea eliminar: ")
-            query = "DELETE FROM proyecto WHERE ID_Proyecto = %s"
+            query = "DELETE FROM PROYECTO WHERE ID_Proyecto = %s"
             cursor.execute(query, (id_proyecto,))
             conexion.commit()
             input("El proyecto se ha eliminado exitosamente...")
@@ -632,7 +632,7 @@ def gestionServicios(conexion):
             if tipo_servicio == '1':
                 tipo_diseno = input("Ingrese el tipo de diseño: ")
                 query_tipo = """
-                INSERT INTO diseño_y_fabricacion (ID_Servicio, tipo_diseno)
+                INSERT INTO DISEÑO_Y_FABRICACION (ID_Servicio, tipo_diseno)
                 VALUES (%s, %s)
                 """
                 cursor.execute(query_tipo, (id_servicio, tipo_diseno))
@@ -641,7 +641,7 @@ def gestionServicios(conexion):
                 tipo_mantenimiento = input("Ingrese el tipo de mantenimiento: ")
                 name_unidad_maquinaria = input("Ingrese el nombre de la unidad/maquinaria: ")
                 query_tipo = """
-                INSERT INTO mantenimiento (ID_Servicio, Tipo_Mantenimiento, Name_Unidad_Maquinaria)
+                INSERT INTO MANTENIMIENTO (ID_Servicio, Tipo_Mantenimiento, Name_Unidad_Maquinaria)
                 VALUES (%s, %s, %s)
                 """
                 cursor.execute(query_tipo, (id_servicio, tipo_mantenimiento, name_unidad_maquinaria))
@@ -649,7 +649,7 @@ def gestionServicios(conexion):
             elif tipo_servicio == '3':
                 tipo_instalacion = input("Ingrese el tipo de instalación: ")
                 query_tipo = """
-                INSERT INTO instalacion_y_montaje (ID_Servicio, tipo_instalacion)
+                INSERT INTO INSTALACION_Y_MONTAJE (ID_Servicio, tipo_instalacion)
                 VALUES (%s, %s)
                 """
                 cursor.execute(query_tipo, (id_servicio, tipo_instalacion))
@@ -657,7 +657,7 @@ def gestionServicios(conexion):
             elif tipo_servicio == '4':
                 tipo_servicio_tecnico = input("Ingrese el tipo de servicio técnico: ")
                 query_tipo = """
-                INSERT INTO servicio_tecnico (ID_Servicio, tipo_servicio)
+                INSERT INTO SERVICIO_TECNICO (ID_Servicio, tipo_servicio)
                 VALUES (%s, %s)
                 """
                 cursor.execute(query_tipo, (id_servicio, tipo_servicio_tecnico))
@@ -707,14 +707,14 @@ def gestionServicios(conexion):
 
             if tipo_servicio == '1':
                 nuevo_tipo_diseno = input("Ingrese el nuevo tipo de diseño: ")
-                query_tipo = "UPDATE diseño_y_fabricacion SET tipo_diseno = %s WHERE ID_Servicio = %s"
+                query_tipo = "UPDATE DISEÑO_Y_FABRICACION SET tipo_diseno = %s WHERE ID_Servicio = %s"
                 cursor.execute(query_tipo, (nuevo_tipo_diseno, id_servicio))
 
             elif tipo_servicio == '2':
                 nuevo_tipo_mantenimiento = input("Ingrese el nuevo tipo de mantenimiento: ")
                 nuevo_name_unidad_maquinaria = input("Ingrese el nuevo nombre de la unidad/maquinaria: ")
                 query_tipo = """
-                UPDATE mantenimiento 
+                UPDATE MANTENIMIENTO 
                 SET Tipo_Mantenimiento = %s, Name_Unidad_Maquinaria = %s 
                 WHERE ID_Servicio = %s
                 """
@@ -722,12 +722,12 @@ def gestionServicios(conexion):
 
             elif tipo_servicio == '3':
                 nuevo_tipo_instalacion = input("Ingrese el nuevo tipo de instalación: ")
-                query_tipo = "UPDATE instalacion_y_montaje SET tipo_instalacion = %s WHERE ID_Servicio = %s"
+                query_tipo = "UPDATE INSTALACION_Y_MONTAJE SET tipo_instalacion = %s WHERE ID_Servicio = %s"
                 cursor.execute(query_tipo, (nuevo_tipo_instalacion, id_servicio))
 
             elif tipo_servicio == '4':
                 nuevo_tipo_servicio_tecnico = input("Ingrese el nuevo tipo de servicio técnico: ")
-                query_tipo = "UPDATE servicio_tecnico SET tipo_servicio = %s WHERE ID_Servicio = %s"
+                query_tipo = "UPDATE SERVICIO_TECNICO SET tipo_servicio = %s WHERE ID_Servicio = %s"
                 cursor.execute(query_tipo, (nuevo_tipo_servicio_tecnico, id_servicio))
 
             else:
@@ -746,10 +746,10 @@ def gestionServicios(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese la nueva descripción: ")
-                query = "UPDATE servicio SET descripcion = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET descripcion = %s WHERE ID_Servicio = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese el nuevo costo del servicio: ")
-                query = "UPDATE servicio SET costo_servicio = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET costo_servicio = %s WHERE ID_Servicio = %s"
             elif campo == '3':
                 while True:
                     nuevo_valor = input("Ingrese el nuevo estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
@@ -758,19 +758,19 @@ def gestionServicios(conexion):
                     if nuevo_valor in ["En progreso", "Terminado"]:
                         break
                     print("Entrada no válida. Intente nuevamente.")
-                query = "UPDATE servicio SET estado = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET estado = %s WHERE ID_Servicio = %s"
             elif campo == '4':
                 nuevo_valor = input("Ingrese la nueva garantía (en meses): ")
-                query = "UPDATE servicio SET garantia = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET garantia = %s WHERE ID_Servicio = %s"
             elif campo == '5':
                 nuevo_valor = input("Ingrese la nueva fecha de inicio (YYYY-MM-DD): ")
-                query = "UPDATE servicio SET Fecha_inicio = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET Fecha_inicio = %s WHERE ID_Servicio = %s"
             elif campo == '6':
                 nuevo_valor = input("Ingrese la nueva fecha de fin (YYYY-MM-DD): ")
-                query = "UPDATE servicio SET Fecha_fin = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET Fecha_fin = %s WHERE ID_Servicio = %s"
             elif campo == '7':
                 nuevo_valor = input("Ingrese el nuevo ID del cliente: ")
-                query = "UPDATE servicio SET ID_cliente = %s WHERE ID_Servicio = %s"
+                query = "UPDATE SERVICIO SET ID_cliente = %s WHERE ID_Servicio = %s"
             else:
                 print("Opción no válida.")
                 continue
@@ -783,12 +783,12 @@ def gestionServicios(conexion):
             # Eliminar servicio
             id_servicio = input("Ingrese el ID del servicio que desea eliminar: ")
             #eliminacion por tablas de servicio especificas
-            tablas_servicios = ["diseño_y_fabricacion", "mantenimiento", "instalacion_y_montaje", "servicio_tecnico"]
+            tablas_servicios = ["DISEÑO_Y_FABRICACION", "MANTENIMIENTO", "INSTALACION_Y_MONTAJE", "SERVICIO_TECNICO"]
             for tabla in tablas_servicios:
                 query = f"DELETE FROM {tabla} WHERE ID_Servicio = %s"
                 cursor.execute(query, (id_servicio,))
             #eliminacion de la tabla servicio general
-            query = "DELETE FROM servicio WHERE ID_Servicio = %s"
+            query = "DELETE FROM SERVICIO WHERE ID_Servicio = %s"
             cursor.execute(query, (id_servicio,))
             conexion.commit()
             input("Servicio eliminado exitosamente de todas las tablas correspondientes...")
@@ -822,7 +822,7 @@ def gestionempleados(conexion):
             correo = input("Ingrese el correo del empleado: ")
 
             query = """
-            INSERT INTO empleado (nombre, cargo, correo)
+            INSERT INTO EMPLEADO (nombre, cargo, correo)
             VALUES (%s, %s, %s)
             """
             cursor.execute(query, (nombre, cargo, correo))
@@ -831,7 +831,7 @@ def gestionempleados(conexion):
 
         elif opcion == '2':
             # Consultar empleados (mostrar todos)
-            query = "SELECT * FROM empleado"
+            query = "SELECT * FROM EMPLEADO"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -859,13 +859,13 @@ def gestionempleados(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese el nuevo nombre del empleado: ")
-                query = "UPDATE empleado SET nombre = %s WHERE ID_Empleado = %s"
+                query = "UPDATE EMPLEADO SET nombre = %s WHERE ID_Empleado = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese el nuevo cargo del empleado: ")
-                query = "UPDATE empleado SET cargo = %s WHERE ID_Empleado = %s"
+                query = "UPDATE EMPLEADO SET cargo = %s WHERE ID_Empleado = %s"
             elif campo == '3':
                 nuevo_valor = input("Ingrese el nuevo correo del empleado: ")
-                query = "UPDATE empleado SET correo = %s WHERE ID_Empleado = %s"
+                query = "UPDATE EMPLEADO SET correo = %s WHERE ID_Empleado = %s"
             else:
                 print("Opción no válida.")
                 continue
@@ -877,7 +877,7 @@ def gestionempleados(conexion):
         elif opcion == '4':
             # Eliminar empleado
             id_empleado = input("Ingrese el ID del empleado que desea eliminar: ")
-            query = "DELETE FROM empleado WHERE ID_Empleado = %s"
+            query = "DELETE FROM EMPLEADO WHERE ID_Empleado = %s"
             cursor.execute(query, (id_empleado,))
             conexion.commit()
             input("Empleado eliminado exitosamente...")
@@ -909,7 +909,7 @@ def gestionMateriales(conexion):
             nombre_material = input("Ingrese el nombre del material: ")
 
             # Verificar si el material ya existe en la tabla inventario
-            query_check_material = "SELECT ID_Inventario, marca, precio_unidad FROM inventario WHERE nombre = %s"
+            query_check_material = "SELECT ID_Inventario, marca, precio_unidad FROM INVENTARIO WHERE nombre = %s"
             cursor.execute(query_check_material, (nombre_material,))
             material_existente = cursor.fetchone()
 
@@ -920,13 +920,13 @@ def gestionMateriales(conexion):
                 precio_unidad = material_existente[2]
 
                 # Sumar +1 al stock en la tabla inventario
-                query_update_stock = "UPDATE inventario SET Stock = Stock + 1 WHERE ID_Inventario = %s"
+                query_update_stock = "UPDATE INVENTARIO SET Stock = Stock + 1 WHERE ID_Inventario = %s"
                 cursor.execute(query_update_stock, (id_inventario,))
                 conexion.commit()
 
                 # Insertar el material en la tabla material
                 query_insert_material = """
-                INSERT INTO material (descripcion, marca, precio_unidad, ID_Inventario)
+                INSERT INTO MATERIAL (descripcion, marca, precio_unidad, ID_Inventario)
                 VALUES (%s, %s, %s, %s)
                 """
                 descripcion = input("Ingrese la descripción del material: ")
@@ -941,7 +941,7 @@ def gestionMateriales(conexion):
                 
                 # Crear un nuevo registro en inventario
                 query_insert_inventario = """
-                INSERT INTO inventario (Stock, nombre, marca, precio_unidad)
+                INSERT INTO INVENTARIO (Stock, nombre, marca, precio_unidad)
                 VALUES (1, %s, %s, %s)
                 """
                 cursor.execute(query_insert_inventario, (nombre_material, marca, precio_unidad))
@@ -952,7 +952,7 @@ def gestionMateriales(conexion):
 
                 # Insertar el material en la tabla material
                 query_insert_material = """
-                INSERT INTO material (descripcion, marca, precio_unidad, ID_Inventario)
+                INSERT INTO MATERIAL (descripcion, marca, precio_unidad, ID_Inventario)
                 VALUES (%s, %s, %s, %s)
                 """
                 cursor.execute(query_insert_material, (descripcion, marca, precio_unidad, id_inventario))
@@ -961,7 +961,7 @@ def gestionMateriales(conexion):
 
         elif opcion == '2':
             # Mostrar los materiales
-            query = "SELECT * FROM material"
+            query = "SELECT * FROM MATERIAL"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -991,13 +991,13 @@ def gestionMateriales(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese la nueva descripción: ")
-                query = "UPDATE material SET descripcion = %s WHERE ID_Material = %s"
+                query = "UPDATE MATERIAL SET descripcion = %s WHERE ID_Material = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese la nueva marca: ")
-                query = "UPDATE material SET marca = %s WHERE ID_Material = %s"
+                query = "UPDATE MATERIAL SET marca = %s WHERE ID_Material = %s"
             elif campo == '3':
                 nuevo_valor = float(input("Ingrese el nuevo precio por unidad: "))
-                query = "UPDATE material SET precio_unidad = %s WHERE ID_Material = %s"
+                query = "UPDATE MATERIAL SET precio_unidad = %s WHERE ID_Material = %s"
             elif campo == '4':
                 print("Seleccione la operación que desea realizar:")
                 print("1. Añadir cantidad")
@@ -1009,7 +1009,7 @@ def gestionMateriales(conexion):
 
                     # Actualizar el stock en la tabla inventario
                     query_update_stock = """
-                    UPDATE inventario 
+                    UPDATE INVENTARIO 
                     SET Stock = Stock + %s 
                     WHERE ID_Inventario = (
                         SELECT ID_Inventario 
@@ -1027,7 +1027,7 @@ def gestionMateriales(conexion):
                     # Verificar si hay suficiente stock antes de restar
                     query_check_stock = """
                     SELECT Stock 
-                    FROM inventario 
+                    FROM INVENTARIO 
                     WHERE ID_Inventario = (
                         SELECT ID_Inventario 
                         FROM material 
@@ -1042,7 +1042,7 @@ def gestionMateriales(conexion):
                     else:
                         # Actualizar el stock en la tabla inventario
                         query_update_stock = """
-                        UPDATE inventario 
+                        UPDATE INVENTARIO 
                         SET Stock = Stock - %s 
                         WHERE ID_Inventario = (
                             SELECT ID_Inventario 
@@ -1066,7 +1066,7 @@ def gestionMateriales(conexion):
             # Eliminar material
             id_material = input("Ingrese el ID del material que desea eliminar: ")
             # Verificar si existen registros dependientes en servicio_material
-            query_check_dependents = "SELECT COUNT(*) FROM servicio_material WHERE ID_Material = %s"
+            query_check_dependents = "SELECT COUNT(*) FROM SERVICIO_MATERIAL WHERE ID_Material = %s"
             cursor.execute(query_check_dependents, (id_material,))
             dependientes = cursor.fetchone()[0]
 
@@ -1078,13 +1078,13 @@ def gestionMateriales(conexion):
                     id_inventario = cursor.fetchone()[0]
 
                     # Eliminar el material
-                    query_delete_material = "DELETE FROM material WHERE ID_Material = %s"
+                    query_delete_material = "DELETE FROM MATERIAL WHERE ID_Material = %s"
                     cursor.execute(query_delete_material, (id_material,))
                     conexion.commit()
                     input("Material eliminado exitosamente.")
 
                     # Restar 1 al Stock del inventario asociado
-                    query_update_stock = "UPDATE inventario SET Stock = Stock - 1 WHERE ID_Inventario = %s"
+                    query_update_stock = "UPDATE INVENTARIO SET Stock = Stock - 1 WHERE ID_Inventario = %s"
                     cursor.execute(query_update_stock, (id_inventario,))
                     conexion.commit()
                     input("Stock actualizado.")
@@ -1117,7 +1117,7 @@ def gestionInventario(conexion):
             precio_unidad = input("Ingrese el precio por unidad: ")
 
             query = """
-            INSERT INTO inventario (Stock, nombre, marca, precio_unidad)
+            INSERT INTO INVENTARIO (Stock, nombre, marca, precio_unidad)
             VALUES (%s, %s, %s, %s)
             """
             cursor.execute(query, (stock, nombre, marca, precio_unidad))
@@ -1126,7 +1126,7 @@ def gestionInventario(conexion):
         
         elif opcion == '2':
             # Consultar inventarios
-            query = "SELECT * FROM inventario"
+            query = "SELECT * FROM INVENTARIO"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -1157,16 +1157,16 @@ def gestionInventario(conexion):
 
             if campo == '1':
                 nuevo_valor = input("Ingrese el nuevo stock: ")
-                query = "UPDATE inventario SET Stock = %s WHERE ID_Inventario = %s"
+                query = "UPDATE INVENTARIO SET Stock = %s WHERE ID_Inventario = %s"
             elif campo == '2':
                 nuevo_valor = input("Ingrese el nuevo nombre: ")
-                query = "UPDATE inventario SET nombre = %s WHERE ID_Inventario = %s"
+                query = "UPDATE INVENTARIO SET nombre = %s WHERE ID_Inventario = %s"
             elif campo == '3':
                 nuevo_valor = input("Ingrese la nueva marca: ")
-                query = "UPDATE inventario SET marca = %s WHERE ID_Inventario = %s"
+                query = "UPDATE INVENTARIO SET marca = %s WHERE ID_Inventario = %s"
             elif campo == '4':
                 nuevo_valor = input("Ingrese el nuevo precio por unidad: ")
-                query = "UPDATE inventario SET precio_unidad = %s WHERE ID_Inventario = %s"
+                query = "UPDATE INVENTARIO SET precio_unidad = %s WHERE ID_Inventario = %s"
             else:
                 print("Opción incorrecta...")
                 continue
@@ -1178,7 +1178,7 @@ def gestionInventario(conexion):
         elif opcion == '4':
             # Eliminar inventario
             id_inventario = input("Ingrese el ID del inventario que desea eliminar: ")
-            query = "DELETE FROM inventario WHERE ID_Inventario = %s"
+            query = "DELETE FROM INVENTARIO WHERE ID_Inventario = %s"
             cursor.execute(query, (id_inventario,))
             conexion.commit()
             input("El inventario se ha eliminado exitosamente...")
@@ -1220,7 +1220,7 @@ def gestion_proveedor(conexion):
             disponibilidad = input("Ingrese la disponibilidad: ")
 
             query = """
-            INSERT INTO proveedor (nombre, correo, telefono, disponibilidad)
+            INSERT INTO PROVEEDOR (nombre, correo, telefono, disponibilidad)
             VALUES (%s, %s, %s, %s)
             """
             cursor.execute(query, (nombre, correo, telefono, disponibilidad))
@@ -1229,7 +1229,7 @@ def gestion_proveedor(conexion):
 
         elif opcion == '2':
             # Consultar proveedores
-            query = "SELECT * FROM proveedor"
+            query = "SELECT * FROM PROVEEDOR"
             cursor.execute(query)
             resultados = cursor.fetchall()
 
@@ -1247,7 +1247,7 @@ def gestion_proveedor(conexion):
             campo = input("Seleccione el campo a editar (nombre, correo, telefono, disponibilidad): ")
             nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
 
-            query = f"UPDATE proveedor SET {campo} = %s WHERE ID_Proveedor = %s"
+            query = f"UPDATE PROVEEDOR SET {campo} = %s WHERE ID_Proveedor = %s"
             cursor.execute(query, (nuevo_valor, id_proveedor))
             conexion.commit()
             print("Proveedor actualizado exitosamente.")
@@ -1255,7 +1255,7 @@ def gestion_proveedor(conexion):
         elif opcion == '4':
             # Eliminar proveedor
             id_proveedor = input("Ingrese el ID del proveedor a eliminar: ")
-            query = "DELETE FROM proveedor WHERE ID_Proveedor = %s"
+            query = "DELETE FROM PROVEEDOR WHERE ID_Proveedor = %s"
             cursor.execute(query, (id_proveedor,))
             conexion.commit()
             print("Proveedor eliminado exitosamente.")
