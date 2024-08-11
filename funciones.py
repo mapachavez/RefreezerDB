@@ -496,17 +496,29 @@ def gestionproyecto(conexion):
 
         if opcion == '1':
             # Añadir un nuevo proyecto
-            nombre = input("Ingrese el nombre del proyecto: ")
-            fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
-            fecha_fin = input("Ingrese la fecha de finalización (YYYY-MM-DD): ")
-            
-            query = """
-            INSERT INTO proyecto (nombre, fecha_inicio, fecha_fin)
-            VALUES (%s, %s, %s)
+            id_cliente = input("Ingrese el ID del cliente: ")
+            # Verificar si el ID_cliente corresponde a un cliente empresa
+            query_check_cliente_empresa = """
+            SELECT ID_cliente FROM CLIENTE_EMPRESA WHERE ID_cliente = %s
             """
-            cursor.execute(query, (nombre, fecha_inicio, fecha_fin))
-            conexion.commit()
-            input("Proyecto añadido exitosamente.")
+            cursor.execute(query_check_cliente_empresa, (id_cliente,))
+            resultado = cursor.fetchone()
+
+            if resultado and resultado[0] == id_cliente:
+                # Si el cliente es una empresa, se solicitan los datos del proyecto
+                nombre = input("Ingrese el nombre del proyecto: ")
+                fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
+                fecha_fin = input("Ingrese la fecha de finalización (YYYY-MM-DD): ")
+
+                query = """
+                INSERT INTO proyecto (nombre, fecha_inicio, fecha_fin, ID_cliente)
+                VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(query, (nombre, fecha_inicio, fecha_fin, id_cliente))
+                conexion.commit()
+                input("Proyecto añadido exitosamente.")
+            else:
+                input("Error: El ID del cliente no corresponde a una empresa. No se puede crear el proyecto.")
         
         elif opcion == '2':
             # Mostrar los proyectos
