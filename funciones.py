@@ -919,8 +919,8 @@ def gestionMateriales(conexion):
                 marca = material_existente[1]
                 precio_unidad = material_existente[2]
 
-                # Sumar +1 al stock en la tabla inventario
-                query_update_stock = "UPDATE INVENTARIO SET Stock = Stock + 1 WHERE ID_Inventario = %s"
+                # SRestar -1 al stock en la tabla inventario
+                query_update_stock = "UPDATE INVENTARIO SET Stock = Stock - 1 WHERE ID_Inventario = %s"
                 cursor.execute(query_update_stock, (id_inventario,))
                 conexion.commit()
 
@@ -934,30 +934,7 @@ def gestionMateriales(conexion):
                 conexion.commit()
                 input("Material añadido exitosamente con datos existentes en el inventario.")
             else:
-                # Si el material no existe, se piden los datos y se crean los registros
-                descripcion = input("Ingrese la descripción del material: ")
-                marca = input("Ingrese la marca del material: ")
-                precio_unidad = input("Ingrese el precio por unidad del material: ")
-                
-                # Crear un nuevo registro en inventario
-                query_insert_inventario = """
-                INSERT INTO INVENTARIO (Stock, nombre, marca, precio_unidad)
-                VALUES (1, %s, %s, %s)
-                """
-                cursor.execute(query_insert_inventario, (nombre_material, marca, precio_unidad))
-                conexion.commit()
-                
-                # Obtener el ID_Inventario recién creado
-                id_inventario = cursor.lastrowid
-
-                # Insertar el material en la tabla material
-                query_insert_material = """
-                INSERT INTO MATERIAL (descripcion, marca, precio_unidad, ID_Inventario)
-                VALUES (%s, %s, %s, %s)
-                """
-                cursor.execute(query_insert_material, (descripcion, marca, precio_unidad, id_inventario))
-                conexion.commit()
-                input("Material añadido exitosamente como nuevo inventario.")
+                input("Material no existe en el inventario, tiene que generar solicitud al proveedor.")
 
         elif opcion == '2':
             # Mostrar los materiales
