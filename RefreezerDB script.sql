@@ -467,3 +467,71 @@ AS SELECT
     JOIN SERVICIO S ON ES.ID_Servicio = S.ID_Servicio
 	ORDER BY 
     E.nombre, C.fecha_vigencia;
+
+-- tabla cliente
+-- procedimiento para la insercion de clientes 
+DELIMITER //
+CREATE PROCEDURE sp_insert_cliente(
+    IN p_nombre VARCHAR(50),
+    IN p_direccion VARCHAR(255),
+    IN p_correo VARCHAR(100),
+    IN p_telefono VARCHAR(10),
+    IN p_tipo_cliente CHAR(1), -- 'N' para Natural, 'E' para Empresa
+    IN p_identificacion VARCHAR(13))
+BEGIN
+    START TRANSACTION;
+
+    INSERT INTO CLIENTE (nombre, direccion, correo, telefono)
+    VALUES (p_nombre, p_direccion, p_correo, p_telefono);
+
+    -- Inserta en la tabla correspondiente al tipo de cliente usando LAST_INSERT_ID() para obtener el ID del cliente recién insertado
+    IF p_tipo_cliente = 'N' THEN
+        INSERT INTO CLIENTE_NATURAL (ID_cliente, Cedula)
+        VALUES (LAST_INSERT_ID(), p_identificacion);
+    ELSEIF p_tipo_cliente = 'E' THEN
+        INSERT INTO CLIENTE_EMPRESA (ID_cliente, RUC)
+        VALUES (LAST_INSERT_ID(), p_identificacion);
+    END IF;
+
+    COMMIT;
+
+    SELECT 'Cliente insertado correctamente';
+END //
+DELIMITER ;
+
+-- procedimiento para actualizacion de clientes
+DELIMITER //
+CREATE PROCEDURE sp_update_cliente(
+    IN p_id_cliente INT,
+    IN p_nombre VARCHAR(50),
+    IN p_direccion VARCHAR(255),
+    IN p_correo VARCHAR(100),
+    IN p_telefono VARCHAR(10))
+BEGIN
+    START TRANSACTION;
+
+    UPDATE CLIENTE 
+    SET nombre = p_nombre, direccion = p_direccion, correo = p_correo, telefono = p_telefono
+    WHERE ID_cliente = p_id_cliente;
+
+    COMMIT;
+
+    SELECT 'Cliente actualizado correctamente';
+END //
+DELIMITER ;
+
+-- procedimiento para eliminacion de cliente
+DELIMITER //
+CREATE PROCEDURE sp_delete_cliente(IN p_id_cliente INT)
+BEGIN
+    START TRANSACTION;
+
+    DELETE FROM CLIENTE_NATURAL WHERE ID_cliente = p_id_cliente;
+    DELETE FROM CLIENTE_EMPRESA WHERE ID_cliente = p_id_cliente;
+    DELETE FROM CLIENTE WHERE ID_cliente = p_id_cliente;
+
+    COMMIT;
+
+    SELECT 'Cliente eliminado correctamente';
+END //
+DELIMITER ;
