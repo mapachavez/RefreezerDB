@@ -414,3 +414,56 @@ BEGIN
     END IF;
 END;
 
+-- reportes 
+
+-- reporte de proyectos por cliente_empresa
+create view clientes_empresa
+AS SELECT 
+    C.nombre AS "Nombre Cliente", 
+    P.nombre AS "Nombre Proyecto", 
+    P.fecha_inicio AS "Fecha Inicio", 
+    P.fecha_fin AS "Fecha Fin"
+	FROM PROYECTO P
+    JOIN PROFORMA PF ON P.ID_proyecto = PF.ID_proyecto
+    JOIN CLIENTE C ON PF.ID_cliente = C.ID_cliente
+    JOIN CLIENTE_EMPRESA CE ON C.ID_cliente = CE.ID_cliente;
+
+-- reporte de servicios por empleado
+create view servicios_por_empleado
+AS SELECT 
+    E.nombre AS "Nombre Empleado",
+    S.descripcion AS "Descripción Servicio",
+    S.estado AS "Estado",
+    S.Fecha_inicio AS "Fecha Inicio",
+    S.Fecha_fin AS "Fecha Fin"
+	FROM SERVICIO S
+    JOIN EMPLEADO_SERVICIO ES ON S.ID_Servicio = ES.ID_Servicio
+    JOIN EMPLEADO E ON ES.ID_Empleado = E.ID_Empleado;
+
+-- reporte de inventario con sus proveedores asosiados
+create view inventario_y_proveedores
+AS SELECT 
+    I.nombre AS "Material",
+    I.Stock AS "Stock Disponible",
+    P.nombre AS "Proveedor",
+    P.disponibilidad AS "Disponibilidad"
+	FROM 
+    INVENTARIO I
+    JOIN INVENTARIO_PROVEEDOR IP ON I.ID_Inventario = IP.ID_Inventario
+    JOIN PROVEEDOR P ON IP.ID_Proveedor = P.ID_Proveedor;
+
+-- reporte de empleados y servicios asosiados donde tambien se mostrara el certificado del empleado 
+create view empleados_y_servicios
+AS SELECT 
+    E.nombre AS "Nombre Empleado",
+    C.descripcion AS "Descripción Certificado",
+    C.fecha_vigencia AS "Fecha Vigencia",
+    S.descripcion AS "Descripción Servicio",
+    S.estado AS "Estado Servicio"
+	FROM 
+    EMPLEADO E
+    JOIN CERTIFICADO C ON E.ID_Empleado = C.ID_Empleado
+    JOIN EMPLEADO_SERVICIO ES ON E.ID_Empleado = ES.ID_Empleado
+    JOIN SERVICIO S ON ES.ID_Servicio = S.ID_Servicio
+	ORDER BY 
+    E.nombre, C.fecha_vigencia;
