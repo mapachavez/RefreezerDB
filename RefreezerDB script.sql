@@ -481,8 +481,8 @@ CREATE PROCEDURE sp_insert_cliente(
 BEGIN
     START TRANSACTION;
 
-    INSERT INTO CLIENTE (nombre, direccion, correo, telefono)
-    VALUES (p_nombre, p_direccion, p_correo, p_telefono);
+    INSERT INTO CLIENTE
+    VALUES (0,p_nombre, p_direccion, p_correo, p_telefono);
 
     -- Inserta en la tabla correspondiente al tipo de cliente usando LAST_INSERT_ID() para obtener el ID del cliente recién insertado
     IF p_tipo_cliente = 'N' THEN
@@ -533,5 +533,74 @@ BEGIN
     COMMIT;
 
     SELECT 'Cliente eliminado correctamente';
+END //
+DELIMITER ;
+
+-- procedimientos para la tabla de servicios
+-- insertar servicio
+DELIMITER // 
+CREATE PROCEDURE sp_insert_servicio(
+    IN p_descripcion TEXT,
+    IN p_costo_servicio DECIMAL(10,2),
+    IN p_estado VARCHAR(50),
+    IN p_garantia INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    IN p_id_cliente INT,
+    IN p_id_proforma INT
+)
+BEGIN
+    START TRANSACTION;
+
+    -- Inserta en la tabla SERVICIO
+    INSERT INTO SERVICIO     
+    VALUES (0,p_descripcion, p_costo_servicio, p_estado, p_garantia, p_fecha_inicio, p_fecha_fin, p_id_cliente, p_id_proforma);
+
+    COMMIT;
+
+    SELECT 'Servicio insertado correctamente';
+END //
+DELIMITER ;
+
+-- actualizacion de servicio
+DELIMITER //
+CREATE PROCEDURE sp_update_servicio(
+    IN p_id_servicio INT,
+    IN p_descripcion TEXT,
+    IN p_costo_servicio DECIMAL(10,2),
+    IN p_estado VARCHAR(50),
+    IN p_garantia INT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE
+)
+BEGIN
+    START TRANSACTION;
+
+    -- Actualiza los datos del servicio en la tabla SERVICIO
+    UPDATE SERVICIO 
+    SET descripcion = p_descripcion, costo_servicio = p_costo_servicio, estado = p_estado, 
+        garantia = p_garantia, Fecha_inicio = p_fecha_inicio, Fecha_fin = p_fecha_fin
+    WHERE ID_Servicio = p_id_servicio;
+
+    COMMIT;
+
+    SELECT 'Servicio actualizado correctamente';
+END //
+DELIMITER ;
+
+-- eliminar servicio
+DELIMITER //
+CREATE PROCEDURE sp_delete_servicio(
+    IN p_id_servicio INT
+)
+BEGIN
+    START TRANSACTION;
+
+    -- Borra el servicio de la tabla SERVICIO
+    DELETE FROM SERVICIO WHERE ID_Servicio = p_id_servicio;
+
+    COMMIT;
+
+    SELECT 'Servicio eliminado correctamente';
 END //
 DELIMITER ;
