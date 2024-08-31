@@ -588,19 +588,62 @@ BEGIN
 END //
 DELIMITER ;
 
+
 -- eliminar servicio
 DELIMITER //
 CREATE PROCEDURE sp_delete_servicio(
     IN p_id_servicio INT
 )
 BEGIN
+    DECLARE id_diseño BOOLEAN DEFAULT FALSE;
+    DECLARE id_tecnico BOOLEAN DEFAULT FALSE;
+    DECLARE id_montaje BOOLEAN DEFAULT FALSE;
+    DECLARE id_mantenimiento BOOLEAN DEFAULT FALSE;
+
     START TRANSACTION;
 
-    -- Borra el servicio de la tabla SERVICIO
+    -- Verifica si el servicio existe en la tabla DISEÑO_Y_FABRICACIÓN
+    SELECT COUNT(*) INTO id_diseño
+    FROM DISEÑO_Y_FABRICACION
+    WHERE ID_Servicio = p_id_servicio;
+
+    IF id_diseño THEN
+        DELETE FROM DISEÑO_Y_FABRICACION WHERE ID_Servicio = p_id_servicio;
+    END IF;
+
+    -- Verifica si el servicio existe en la tabla SERVICIO_TECNICO
+    SELECT COUNT(*) INTO id_tecnico
+    FROM SERVICIO_TECNICO
+    WHERE ID_Servicio = p_id_servicio;
+
+    IF id_tecnico THEN
+        DELETE FROM SERVICIO_TECNICO WHERE ID_Servicio = p_id_servicio;
+    END IF;
+
+    -- Verifica si el servicio existe en la tabla INSTALACION_Y_MONTAJE
+    SELECT COUNT(*) INTO id_montaje
+    FROM INSTALACION_Y_MONTAJE
+    WHERE ID_Servicio = p_id_servicio;
+
+    IF id_montaje THEN
+        DELETE FROM INSTALACION_Y_MONTAJE WHERE ID_Servicio = p_id_servicio;
+    END IF;
+
+    -- Verifica si el servicio existe en la tabla MANTENIMIENTO
+    SELECT COUNT(*) INTO id_mantenimiento
+    FROM MANTENIMIENTO
+    WHERE ID_Servicio = p_id_servicio;
+
+    IF id_mantenimiento THEN
+        DELETE FROM MANTENIMIENTO WHERE ID_Servicio = p_id_servicio;
+    END IF;
+
+    -- Finalmente, borra el servicio de la tabla SERVICIO
     DELETE FROM SERVICIO WHERE ID_Servicio = p_id_servicio;
 
     COMMIT;
 
-    SELECT 'Servicio eliminado correctamente';
+    -- Enviar una señal de éxito
+    SELECT 'Servicio eliminado correctamente de todas las tablas relacionadas';
 END //
 DELIMITER ;
