@@ -947,6 +947,6 @@ GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario5'@'localhost';
 GRANT EXECUTE ON PROCEDURE refreezerdb.sp_insert_cliente TO 'usuario1'@'localhost';
 -- Debe existir por lo menos 2 permisos a vistas
 GRANT SELECT, UPDATE ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
-GRANT SELECT ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
+GRANT SELECT ON refreezerdb.clientes_empresa TO 'usuario5'@'localhost';
 GRANT SELECT, UPDATE ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
-GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
+GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuario2'@'localhost';
