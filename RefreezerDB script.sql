@@ -510,16 +510,28 @@ CREATE PROCEDURE sp_update_cliente(
     IN p_nombre VARCHAR(50),
     IN p_direccion VARCHAR(255),
     IN p_correo VARCHAR(100),
-    IN p_telefono VARCHAR(10))
+    IN p_telefono VARCHAR(10),
+    IN p_cedula VARCHAR(13),
+    IN p_ruc VARCHAR(13)       
+)
 BEGIN
     START TRANSACTION;
-
     UPDATE CLIENTE 
     SET nombre = p_nombre, direccion = p_direccion, correo = p_correo, telefono = p_telefono
     WHERE ID_cliente = p_id_cliente;
 
-    COMMIT;
+    IF EXISTS (SELECT * FROM CLIENTE_NATURAL WHERE ID_cliente = p_id_cliente) THEN
+        UPDATE CLIENTE_NATURAL 
+        SET Cedula = p_cedula
+        WHERE ID_cliente = p_id_cliente;
+    END IF;
 
+    IF EXISTS (SELECT * FROM CLIENTE_EMPRESA WHERE ID_cliente = p_id_cliente) THEN
+        UPDATE CLIENTE_EMPRESA 
+        SET RUC = p_ruc
+        WHERE ID_cliente = p_id_cliente;
+    END IF;
+    COMMIT;
     SELECT 'Cliente actualizado correctamente';
 END //
 DELIMITER ;
@@ -556,12 +568,9 @@ CREATE PROCEDURE sp_insert_servicio(
 BEGIN
     START TRANSACTION;
 
-    -- Inserta en la tabla SERVICIO
     INSERT INTO SERVICIO     
     VALUES (0,p_descripcion, p_costo_servicio, p_estado, p_garantia, p_fecha_inicio, p_fecha_fin, p_id_cliente, p_id_proforma);
-
     COMMIT;
-
     SELECT 'Servicio insertado correctamente';
 END //
 DELIMITER ;
