@@ -959,3 +959,10 @@ GRANT SELECT, UPDATE ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
 GRANT SELECT ON refreezerdb.clientes_empresa TO 'usuario5'@'localhost';
 GRANT SELECT, UPDATE ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
 GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuario2'@'localhost';
+
+-- Añadir por lo menos 5 índices a su BD
+CREATE INDEX idx_cliente_nombre ON CLIENTE(nombre);
+CREATE INDEX idx_proforma_fecha_emision ON PROFORMA(fecha_emision);
+CREATE INDEX idx_servicio_estado ON SERVICIO(estado);
+CREATE INDEX idx_inventario_nombre ON INVENTARIO(nombre);
+CREATE INDEX idx_proveedor_nombre ON PROVEEDOR(nombre);
