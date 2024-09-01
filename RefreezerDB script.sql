@@ -736,3 +736,83 @@ BEGIN
     SELECT 'Servicio eliminado correctamente de todas las tablas relacionadas';
 END //
 DELIMITER ;
+
+-- sp para insertar proformas
+DELIMITER //
+CREATE PROCEDURE sp_insert_proforma(
+    IN p_fecha_emision DATE,
+    IN p_costo_mano_obra DECIMAL(10,2),
+    IN p_subtotal DECIMAL(10,2),
+    IN p_estado_aprobacion VARCHAR(50),
+    IN p_calle VARCHAR(100),
+    IN p_manzana VARCHAR(50),
+    IN p_ciudad VARCHAR(100),
+    IN p_visita_fecha DATE,
+    IN p_visita_hora TIME,
+    IN p_visita_observacion TEXT,
+    IN p_id_proyecto INT,
+    IN p_id_cliente INT
+)
+BEGIN
+    START TRANSACTION;
+
+    INSERT INTO PROFORMA
+    VALUES (
+        0,p_fecha_emision, p_costo_mano_obra, p_subtotal, p_estado_aprobacion, 
+        p_calle, p_manzana, p_ciudad, p_visita_fecha, p_visita_hora, 
+        p_visita_observacion, p_id_proyecto, p_id_cliente
+    );
+    COMMIT;
+    SELECT 'Proforma insertada correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar la proforma
+DELIMITER //
+CREATE PROCEDURE sp_update_proforma(
+    IN p_id_proforma INT,
+    IN p_fecha_emision DATE,
+    IN p_costo_mano_obra DECIMAL(10,2),
+    IN p_subtotal DECIMAL(10,2),
+    IN p_estado_aprobacion VARCHAR(50),
+    IN p_calle VARCHAR(100),
+    IN p_manzana VARCHAR(50),
+    IN p_ciudad VARCHAR(100),
+    IN p_visita_fecha DATE,
+    IN p_visita_hora TIME,
+    IN p_visita_observacion TEXT
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE PROFORMA 
+    SET 
+        fecha_emision = p_fecha_emision,
+        costo_mano_obra = p_costo_mano_obra,
+        subtotal = p_subtotal,
+        estado_aprobacion = p_estado_aprobacion,
+        calle = p_calle,
+        manzana = p_manzana,
+        ciudad = p_ciudad,
+        visita_fecha = p_visita_fecha,
+        visita_hora = p_visita_hora,
+        visita_observacion = p_visita_observacion
+    WHERE ID_proforma = p_id_proforma;
+    COMMIT;
+    SELECT 'Proforma actualizada correctamente';
+END //
+DELIMITER ;
+
+-- sp para eliminar proformas 
+DELIMITER //
+CREATE PROCEDURE sp_delete_proforma(
+    IN p_id_proforma INT
+)
+BEGIN
+    START TRANSACTION;
+
+    DELETE FROM PROFORMA WHERE ID_proforma = p_id_proforma;
+    COMMIT;
+    SELECT 'Proforma eliminada correctamente';
+END //
+DELIMITER ;
