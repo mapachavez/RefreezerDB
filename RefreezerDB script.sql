@@ -562,6 +562,93 @@ BEGIN
 END //
 DELIMITER ;
 
+-- sp para insertar diseño y fabricacion
+DELIMITER //
+CREATE PROCEDURE sp_insert_diseno_y_fabricacion(
+    IN p_diseno TEXT,
+    IN p_tipo_diseno TEXT
+)
+BEGIN
+    DECLARE v_id_servicio INT;
+
+    SET v_id_servicio = LAST_INSERT_ID();
+    START TRANSACTION;
+    INSERT INTO DISEÑO_Y_FABRICACIÓN (
+        ID_Servicio, diseño, tipo_diseño
+    )
+    VALUES (
+        v_id_servicio, p_diseno, p_tipo_diseno
+    );
+    COMMIT;
+    SELECT 'Registro insertado en la tabla Diseño y Fabricación correctamente';
+END //
+DELIMITER ;
+
+-- sp para insertar un servicio tecnico
+DELIMITER //
+CREATE PROCEDURE sp_insert_servicio_tecnico(
+    IN p_tipo_servicio TEXT
+)
+BEGIN
+    DECLARE v_id_servicio INT;
+
+    SET v_id_servicio = LAST_INSERT_ID();
+    START TRANSACTION;
+    INSERT INTO SERVICIO_TECNICO (
+        ID_Servicio, tipo_servicio
+    )
+    VALUES (
+        v_id_servicio, p_tipo_servicio
+    );
+    COMMIT;
+    SELECT 'Registro insertado en la tabla Servicio Técnico correctamente';
+END //
+DELIMITER ;
+
+-- sp para insertar una instalacion y montaje
+DELIMITER // 
+CREATE PROCEDURE sp_insert_instalacion_y_montaje(
+    IN p_tipo_instalacion TEXT
+)
+BEGIN
+    DECLARE v_id_servicio INT;
+
+    SET v_id_servicio = LAST_INSERT_ID();
+    START TRANSACTION;
+    INSERT INTO INSTALACION_Y_MONTAJE (
+        ID_Servicio, tipo_instalacion
+    )
+    VALUES (
+        v_id_servicio, p_tipo_instalacion
+    );
+    COMMIT;
+    SELECT 'Registro insertado en la tabla Instalación y Montaje correctamente';
+END //
+DELIMITER ;
+
+-- sp para insertar un mantenimiento
+DELIMITER //
+CREATE PROCEDURE sp_insert_mantenimiento(
+    IN p_tipo_mantenimiento TEXT,
+    IN p_name_unidad_maquinaria TEXT
+)
+BEGIN
+    DECLARE v_id_servicio INT;
+
+    SET v_id_servicio = LAST_INSERT_ID();
+    START TRANSACTION;
+    INSERT INTO MANTENIMIENTO (
+        ID_Servicio, Tipo_Mantenimiento, Name_Unidad_Maquinaria
+    )
+    VALUES (
+        v_id_servicio, p_tipo_mantenimiento, p_name_unidad_maquinaria
+    );
+    COMMIT;
+    SELECT 'Registro insertado en la tabla Mantenimiento correctamente';
+END //
+DELIMITER ;
+
+
 -- actualizacion de servicio
 DELIMITER //
 CREATE PROCEDURE sp_update_servicio(
@@ -595,10 +682,10 @@ CREATE PROCEDURE sp_delete_servicio(
     IN p_id_servicio INT
 )
 BEGIN
-    DECLARE id_diseño BOOLEAN DEFAULT FALSE;
-    DECLARE id_tecnico BOOLEAN DEFAULT FALSE;
-    DECLARE id_montaje BOOLEAN DEFAULT FALSE;
-    DECLARE id_mantenimiento BOOLEAN DEFAULT FALSE;
+    DECLARE id_diseño INT DEFAULT 0;
+    DECLARE id_tecnico INT DEFAULT 0;
+    DECLARE id_montaje INT DEFAULT 0;
+    DECLARE id_mantenimiento INT DEFAULT 0;
 
     START TRANSACTION;
 
@@ -607,7 +694,7 @@ BEGIN
     FROM DISEÑO_Y_FABRICACION
     WHERE ID_Servicio = p_id_servicio;
 
-    IF id_diseño THEN
+    IF id_diseño > 0 THEN
         DELETE FROM DISEÑO_Y_FABRICACION WHERE ID_Servicio = p_id_servicio;
     END IF;
 
@@ -616,7 +703,7 @@ BEGIN
     FROM SERVICIO_TECNICO
     WHERE ID_Servicio = p_id_servicio;
 
-    IF id_tecnico THEN
+    IF id_tecnico > 0 THEN
         DELETE FROM SERVICIO_TECNICO WHERE ID_Servicio = p_id_servicio;
     END IF;
 
@@ -625,7 +712,7 @@ BEGIN
     FROM INSTALACION_Y_MONTAJE
     WHERE ID_Servicio = p_id_servicio;
 
-    IF id_montaje THEN
+    IF id_montaje > 0 THEN
         DELETE FROM INSTALACION_Y_MONTAJE WHERE ID_Servicio = p_id_servicio;
     END IF;
 
@@ -634,16 +721,14 @@ BEGIN
     FROM MANTENIMIENTO
     WHERE ID_Servicio = p_id_servicio;
 
-    IF id_mantenimiento THEN
+    IF id_mantenimiento > 0 THEN
         DELETE FROM MANTENIMIENTO WHERE ID_Servicio = p_id_servicio;
     END IF;
 
     -- Finalmente, borra el servicio de la tabla SERVICIO
     DELETE FROM SERVICIO WHERE ID_Servicio = p_id_servicio;
-
     COMMIT;
 
-    -- Enviar una señal de éxito
     SELECT 'Servicio eliminado correctamente de todas las tablas relacionadas';
 END //
 DELIMITER ;
