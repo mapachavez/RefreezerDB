@@ -816,3 +816,56 @@ BEGIN
     SELECT 'Proforma eliminada correctamente';
 END //
 DELIMITER ;
+
+-- tabla Inventario
+-- sp para insertar inventario
+DELIMITER //
+CREATE PROCEDURE sp_insert_inventario(
+    IN p_nombre VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    START TRANSACTION;
+
+    INSERT INTO INVENTARIO
+    VALUES (0, p_stock, p_nombre, p_marca, p_precio_unidad);
+    COMMIT;
+    SELECT 'Inventario insertado correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar inventario
+DELIMITER //
+CREATE PROCEDURE sp_update_inventario(
+    IN p_id_inventario INT,
+    IN p_nombre VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE INVENTARIO 
+    SET Stock = p_stock, nombre = p_nombre, marca = p_marca, precio_unidad = p_precio_unidad
+    WHERE ID_Inventario = p_id_inventario;
+    COMMIT;
+    SELECT 'Inventario actualizado correctamente';
+END //
+DELIMITER ;
+
+-- sp para eliminar inventario
+DELIMITER //
+CREATE PROCEDURE sp_delete_inventario(
+    IN p_id_inventario INT
+)
+BEGIN
+    START TRANSACTION;
+    
+    DELETE FROM INVENTARIO WHERE ID_Inventario = p_id_inventario;
+    COMMIT;
+    SELECT 'Inventario eliminado correctamente';
+END //
+DELIMITER ;
