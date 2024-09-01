@@ -906,34 +906,23 @@ def gestionMateriales(conexion):
         if opcion == '1':
             # Añadir un nuevo material
             nombre_material = input("Ingrese el nombre del material: ")
-
-            # Verificar si el material ya existe en la tabla inventario
-            query_check_material = "SELECT ID_Inventario, marca, precio_unidad FROM INVENTARIO WHERE nombre = %s"
-            cursor.execute(query_check_material, (nombre_material,))
+            cursor.execute("SELECT ID_Inventario, marca, precio_unidad FROM INVENTARIO WHERE nombre = %s", (nombre_material,))
             material_existente = cursor.fetchone()
 
             if material_existente:
-                # Si el material existe, se asignan los datos automáticamente
                 id_inventario = material_existente[0]
                 marca = material_existente[1]
                 precio_unidad = material_existente[2]
-
-                # SRestar -1 al stock en la tabla inventario
-                query_update_stock = "UPDATE INVENTARIO SET Stock = Stock - 1 WHERE ID_Inventario = %s"
-                cursor.execute(query_update_stock, (id_inventario,))
-                conexion.commit()
-
-                # Insertar el material en la tabla material
-                query_insert_material = """
-                INSERT INTO MATERIAL (descripcion, marca, precio_unidad, ID_Inventario)
-                VALUES (%s, %s, %s, %s)
-                """
                 descripcion = input("Ingrese la descripción del material: ")
-                cursor.execute(query_insert_material, (descripcion, marca, precio_unidad, id_inventario))
+
+                # Llamar al procedimiento almacenado para insertar material
+                cursor.callproc('sp_insert_material', (descripcion, marca, precio_unidad, id_inventario))
                 conexion.commit()
-                input("Material añadido exitosamente con datos existentes en el inventario.")
+                for result in cursor.stored_results():
+                    print(result.fetchone()[0])
             else:
-                input("Material no existe en el inventario, tiene que generar solicitud al proveedor.")
+                for result in cursor.stored_results():
+                    print(result.fetchone()[0])
 
         elif opcion == '2':
             # Mostrar los materiales
@@ -958,22 +947,40 @@ def gestionMateriales(conexion):
 
         elif opcion == '3':
             id_material = input("Ingrese el ID del material que desea editar: ")
+
+            cursor.execute(
+                "SELECT descripcion, marca, precio_unidad FROM MATERIAL WHERE ID_Material = %s",
+                (id_material,))
+            material = cursor.fetchone()
+
+            if material is None:
+                print("Material no encontrado.")
+                continue
+
+            (descripcion_actual, marca_actual, precio_unidad_actual) = material
+
+            print("Valores actuales:")
+            print(f"Descripción: {descripcion_actual}")
+            print(f"Marca: {marca_actual}")
+            print(f"Precio por Unidad: {precio_unidad_actual:.2f}")
+
             print("Seleccione el campo que desea editar:")
             print("1. Descripción")
             print("2. Marca")
             print("3. Precio por Unidad")
-            print("4. cantidad de material")
+            print("4. Cantidad de material")
             campo = input("Opción: ")
 
+            nuevo_descripcion = descripcion_actual
+            nuevo_marca = marca_actual
+            nuevo_precio_unidad = precio_unidad_actual
+
             if campo == '1':
-                nuevo_valor = input("Ingrese la nueva descripción: ")
-                query = "UPDATE MATERIAL SET descripcion = %s WHERE ID_Material = %s"
+                nuevo_descripcion = input("Ingrese la nueva descripción: ")
             elif campo == '2':
-                nuevo_valor = input("Ingrese la nueva marca: ")
-                query = "UPDATE MATERIAL SET marca = %s WHERE ID_Material = %s"
+                nuevo_marca = input("Ingrese la nueva marca: ")
             elif campo == '3':
-                nuevo_valor = float(input("Ingrese el nuevo precio por unidad: "))
-                query = "UPDATE MATERIAL SET precio_unidad = %s WHERE ID_Material = %s"
+                nuevo_precio_unidad = float(input("Ingrese el nuevo precio por unidad: "))
             elif campo == '4':
                 print("Seleccione la operación que desea realizar:")
                 print("1. Añadir cantidad")
@@ -1031,39 +1038,30 @@ def gestionMateriales(conexion):
                         input("Cantidad quitada exitosamente del inventario.")
 
             else:
-                print("Opción incorrecta...")
+                print("Opción no válida.")
                 continue
 
-            cursor.execute(query, (nuevo_valor, id_material))
+            # Llamar al procedimiento almacenado para actualizar material
+            cursor.callproc('sp_update_material', [
+                id_material,
+                nuevo_descripcion,
+                nuevo_marca,
+                nuevo_precio_unidad
+            ])
             conexion.commit()
-            input("Material actualizado exitosamente...")
+
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
 
         elif opcion == '4':
             # Eliminar material
             id_material = input("Ingrese el ID del material que desea eliminar: ")
-            # Verificar si existen registros dependientes en servicio_material
-            query_check_dependents = "SELECT COUNT(*) FROM SERVICIO_MATERIAL WHERE ID_Material = %s"
-            cursor.execute(query_check_dependents, (id_material,))
-            dependientes = cursor.fetchone()[0]
 
-            if dependientes > 0:
-                    input("No se puede eliminar el material porque hay registros dependientes en servicio_material.")
-            else:
-                    # Obtener el ID_Inventario antes de eliminar el material
-                    cursor.execute("SELECT ID_Inventario FROM material WHERE ID_Material = %s", (id_material,))
-                    id_inventario = cursor.fetchone()[0]
-
-                    # Eliminar el material
-                    query_delete_material = "DELETE FROM MATERIAL WHERE ID_Material = %s"
-                    cursor.execute(query_delete_material, (id_material,))
-                    conexion.commit()
-                    input("Material eliminado exitosamente.")
-
-                    # Restar 1 al Stock del inventario asociado
-                    query_update_stock = "UPDATE INVENTARIO SET Stock = Stock - 1 WHERE ID_Inventario = %s"
-                    cursor.execute(query_update_stock, (id_inventario,))
-                    conexion.commit()
-                    input("Stock actualizado.")
+            cursor.callproc('sp_delete_material', (id_material,))
+            conexion.commit()
+            
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
 
         elif opcion == '5':
             input("Saliendo del sistema de gestión de materiales...")
@@ -1087,18 +1085,16 @@ def gestionInventario(conexion):
 
         if opcion == '1':
             # Añadir un nuevo inventario
-            stock = input("Ingrese el stock del inventario: ")
+            stock = int(input("Ingrese el stock del inventario: "))
             nombre = input("Ingrese el nombre del inventario: ")
             marca = input("Ingrese la marca del inventario: ")
-            precio_unidad = input("Ingrese el precio por unidad: ")
+            precio_unidad = float(input("Ingrese el precio por unidad: "))
 
-            query = """
-            INSERT INTO INVENTARIO (Stock, nombre, marca, precio_unidad)
-            VALUES (%s, %s, %s, %s)
-            """
-            cursor.execute(query, (stock, nombre, marca, precio_unidad))
+            # Llamar al procedimiento almacenado para insertar inventario
+            cursor.callproc('sp_insert_inventario', (nombre, marca, precio_unidad, stock))
             conexion.commit()
-            input("Inventario añadido exitosamente.")
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
         
         elif opcion == '2':
             # Consultar inventarios
@@ -1122,43 +1118,63 @@ def gestionInventario(conexion):
                 print("No se encontraron inventarios.")
         
         elif opcion == '3':
-            # Editar inventario
+
             id_inventario = input("Ingrese el ID del inventario que desea editar: ")
-            print("Seleccione el campo que desea editar:")
-            print("1. Stock")
-            print("2. Nombre")
-            print("3. Marca")
-            print("4. Precio por unidad")
-            campo = input("Opción: ")
 
-            if campo == '1':
-                nuevo_valor = input("Ingrese el nuevo stock: ")
-                query = "UPDATE INVENTARIO SET Stock = %s WHERE ID_Inventario = %s"
-            elif campo == '2':
-                nuevo_valor = input("Ingrese el nuevo nombre: ")
-                query = "UPDATE INVENTARIO SET nombre = %s WHERE ID_Inventario = %s"
-            elif campo == '3':
-                nuevo_valor = input("Ingrese la nueva marca: ")
-                query = "UPDATE INVENTARIO SET marca = %s WHERE ID_Inventario = %s"
-            elif campo == '4':
-                nuevo_valor = input("Ingrese el nuevo precio por unidad: ")
-                query = "UPDATE INVENTARIO SET precio_unidad = %s WHERE ID_Inventario = %s"
+            # Obtener los valores actuales del inventario
+            cursor.execute("SELECT nombre, marca, precio_unidad, stock FROM INVENTARIO WHERE ID_Inventario = %s", (id_inventario,))
+            inventario_actual = cursor.fetchone()
+
+            if inventario_actual:
+                nombre_actual, marca_actual, precio_unidad_actual, stock_actual = inventario_actual
+
+                print("Valores actuales:")
+                print(f"Nombre: {nombre_actual}")
+                print(f"Marca: {marca_actual}")
+                print(f"Precio por Unidad: {precio_unidad_actual:.2f}")
+                print(f"Stock: {stock_actual}")
+
+                print("Seleccione el campo que desea editar:")
+                print("1. Nombre")
+                print("2. Marca")
+                print("3. Precio por unidad")
+                print("4. Stock")
+                campo = input("Opción: ")
+
+                nuevo_nombre = nombre_actual
+                nueva_marca = marca_actual
+                nuevo_precio_unidad = precio_unidad_actual
+                nuevo_stock = stock_actual
+
+                if campo == '1':
+                    nuevo_nombre = input("Ingrese el nuevo nombre: ")
+                elif campo == '2':
+                    nueva_marca = input("Ingrese la nueva marca: ")
+                elif campo == '3':
+                    nuevo_precio_unidad = float(input("Ingrese el nuevo precio por unidad: "))
+                elif campo == '4':
+                    nuevo_stock = int(input("Ingrese el nuevo stock: "))
+                else:
+                    print("Opción incorrecta...")
+                    continue
+
+                # Llamar al procedimiento almacenado para actualizar inventario
+                cursor.callproc('sp_update_inventario', (id_inventario, nuevo_nombre, nueva_marca, nuevo_precio_unidad, nuevo_stock))
+                conexion.commit()
+                for result in cursor.stored_results():
+                    print(result.fetchone()[0])
             else:
-                print("Opción incorrecta...")
-                continue
-
-            cursor.execute(query, (nuevo_valor, id_inventario))
-            conexion.commit()
-            input("Inventario actualizado exitosamente...")
+                print("Inventario no encontrado.")
         
         elif opcion == '4':
-            # Eliminar inventario
             id_inventario = input("Ingrese el ID del inventario que desea eliminar: ")
-            query = "DELETE FROM INVENTARIO WHERE ID_Inventario = %s"
-            cursor.execute(query, (id_inventario,))
-            conexion.commit()
-            input("El inventario se ha eliminado exitosamente...")
 
+            # Llamar al procedimiento almacenado para eliminar inventario
+            cursor.callproc('sp_delete_inventario', (id_inventario,))
+            conexion.commit()
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
+                
         elif opcion == '5':
             # Salir
             input("Saliendo del sistema de gestión de inventarios...")
