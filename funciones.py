@@ -16,52 +16,37 @@ def gestionClientes(conexion):
         if opc == "1":
             print("\n------\t Insertar nuevos clientes \t------")
             try:
-                conexion.start_transaction()
-                
                 nombre = input("\nIntroduzca el nombre: ")
                 direccion = input("Introduzca la direccion: ")
                 mail = input("Introduzca el correo: ")
                 telf = input("Introduzca el telefono: ")
-                
-                query_c = "INSERT INTO CLIENTE (nombre, direccion, correo, telefono) VALUES (%s, %s, %s, %s)"
-                val_c = (nombre, direccion, mail, telf)
-                cursor.execute(query_c, val_c)
-                
-                id_cliente = cursor.lastrowid
-                
+
                 tipo = ""
                 while tipo == "":
                     tipo = input("""\n\t\tTipo de cliente:
-                                
                             1. Cliente natural
                             2. Cliente empresa
-                            
-                        Inserte tipo de cliente: """)
-                    
-                    if tipo == "1":
-                        cedula = input("Ingrese el numero de cedula: ")
-                        query_cn = "INSERT INTO CLIENTE_NATURAL (ID_cliente, Cedula) VALUES (%s, %s)"
-                        val_cn = (id_cliente, cedula)
-                        cursor.execute(query_cn,val_cn)
-                    elif tipo == "2":
-                        ruc = input("Ingrese el ruc de la empresa: ")
-                        query_ce = "INSERT INTO CLIENTE_EMPRESA (ID_cliente, RUC) VALUES (%s, %s)"
-                        val_ce = (id_cliente, ruc)
-                        cursor.execute(query_ce,val_ce)
-                    else:
-                        input("Opcion no válida. Intente nuevamente...")
-                        tipo = ""
-                
-                # Confirmar la transacción si ambas inserciones son exitosas
+                            Inserte tipo de cliente: """)
+
+                if tipo == "1":
+                    cedula = input("Ingrese el numero de cedula: ")
+                    cursor.callproc('sp_insert_cliente', (nombre, direccion, mail, telf, 'N', cedula))
+                elif tipo == "2":
+                    ruc = input("Ingrese el ruc de la empresa: ")
+                    cursor.callproc('sp_insert_cliente', (nombre, direccion, mail, telf, 'E', ruc))
+                else:
+                    input("Opcion no válida. Intente nuevamente...")
+
                 conexion.commit()
                 input("\nINFO: Cliente insertado correctamente...\n")
-            
-            except mysql.connector.Error as err:
+
+            except mysql.connector.Error as err: # type: ignore
                 print(f"Error: {err} \n")
-                # Deshacer la transacción si ocurre un error
                 conexion.rollback()
+
             finally:
                 cursor.close()
+
         elif opc == "2":
             ocon = ""
             while ocon != "3":
@@ -84,7 +69,7 @@ def gestionClientes(conexion):
                         
                         input("\nConsulta exitosa! \nPresione enter para continuar...")
 
-                    except mysql.connector.Error as err:
+                    except mysql.connector.Error as err: # type: ignore
                         print(f"Error: {err}")
                 elif ocon == "2":
                     print("\n---------- \t\t Consulta de clientes empresa \t\t----------\n")
@@ -99,7 +84,7 @@ def gestionClientes(conexion):
 
                         input("\nConsulta exitosa! \nPresione enter para continuar...")
                         
-                    except mysql.connector.Error as err:
+                    except mysql.connector.Error as err: # type: ignore
                         print(f"Error: {err}")
                 elif ocon =="3":
                     input("Regresando al menú anterior...\n")
@@ -108,142 +93,111 @@ def gestionClientes(conexion):
                     ocon = ""
                     
             cursor.close()
+
         elif opc == "3":
             print("\n------\t Modificar datos de clientes \t------")
+
+            # Selección del tipo de cliente
             while True:
                 print("\nSeleccione el tipo de cliente:")
                 print("1. Cliente Natural")
                 print("2. Cliente Empresa")
-                
                 tipo_cliente = input("\nIngrese el número correspondiente al tipo de cliente: ")
-                
                 if tipo_cliente in ['1', '2']:
                     break
                 else:
                     print("Selección inválida. Por favor, intente de nuevo.")
-            
-            id_cliente = input("Ingrese el ID del cliente: ")
-            
-            # Selección de la tabla a modificar
-            while True:
-                print("\nSeleccione la tabla que desea modificar:")
-                print("1. Tabla CLIENTE")
-                print("2. Tabla CLIENTE_NATURAL o CLIENTE_EMPRESA")
-                
-                tabla_seleccionada = input("Ingrese el número correspondiente a la tabla: ")
-                
-                if tabla_seleccionada in ['1', '2']:
-                    break
-                else:
-                    print("Selección inválida. Por favor, intente de nuevo.")
-                    
-            if tabla_seleccionada == '1':
-                # Modificación en la tabla CLIENTE
-                while True:
-                    print("\nSeleccione el campo a modificar en la tabla CLIENTE:")
-                    print("1. Nombre")
-                    print("2. Dirección")
-                    print("3. Correo")
-                    print("4. Teléfono")
-                    
-                    campo_seleccionado = input("Ingrese el número correspondiente al campo: ")
-                    
-                    campos = {
-                        '1': 'nombre',
-                        '2': 'direccion',
-                        '3': 'correo',
-                        '4': 'telefono'
-                    }
-                    
-                    campo = campos.get(campo_seleccionado)
-                    
-                    if campo:
-                        nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
-                        consulta = f"UPDATE CLIENTE SET {campo} = %s WHERE ID_cliente = %s"
-                        cursor.execute(consulta, (nuevo_valor, id_cliente))
-                        print(f"\nRegistro en la tabla CLIENTE con ID {id_cliente} actualizado correctamente.")
-                        break
-                    else:
-                        print("Selección de campo inválida. Por favor, intente de nuevo.")
-            
-            elif tabla_seleccionada == '2':
-                # Modificación en la tabla CLIENTE_NATURAL o CLIENTE_EMPRESA
-                if tipo_cliente == '1':
-                    while True:
-                        print("\nSeleccione el campo a modificar en la tabla CLIENTE_NATURAL:")
-                        print("1. Cédula")
-                        
-                        seleccion = input("Ingrese el número correspondiente al campo: ")
-                        
-                        if seleccion == '1':
-                            campo = 'Cedula'
-                            tabla = 'CLIENTE_NATURAL'
-                            break
-                        else:
-                            print("Selección de campo inválida. Por favor, intente de nuevo.")
-                
-                elif tipo_cliente == '2':
-                    while True:
-                        print("\nSeleccione el campo a modificar en la tabla CLIENTE_EMPRESA:")
-                        print("1. RUC")
-                        
-                        seleccion = input("Ingrese el número correspondiente al campo: ")
-                        
-                        if seleccion == '1':
-                            campo = 'RUC'
-                            tabla = 'CLIENTE_EMPRESA'
-                            break
-                        else:
-                            print("Selección de campo inválida. Por favor, intente de nuevo.")
 
-                nuevo_valor = input(f"Ingrese el nuevo valor para {campo}: ")
-                consulta = f"UPDATE {tabla} SET {campo} = %s WHERE ID_cliente = %s"
-                cursor.execute(consulta, (nuevo_valor, id_cliente))
-                print(f"\nRegistro en la tabla {tabla} con ID {id_cliente} actualizado correctamente.")
-            #Aplicar los cambios
+            id_cliente = input("Ingrese el ID del cliente: ")
+
+            # Recuperar los valores actuales del cliente
+            if tipo_cliente == '1':
+                cursor.execute(
+                    "SELECT c.nombre, c.direccion, c.correo, c.telefono, cn.Cedula "
+                    "FROM CLIENTE c JOIN CLIENTE_NATURAL cn ON c.ID_cliente = cn.ID_cliente "
+                    "WHERE c.ID_cliente = %s", (id_cliente,))
+            else:
+                cursor.execute(
+                    "SELECT c.nombre, c.direccion, c.correo, c.telefono, ce.RUC "
+                    "FROM CLIENTE c JOIN CLIENTE_EMPRESA ce ON c.ID_cliente = ce.ID_cliente "
+                    "WHERE c.ID_cliente = %s", (id_cliente,))
+
+            cliente = cursor.fetchone()
+
+            if cliente is None:
+                print("Cliente no encontrado.")
+                continue
+
+            (nombre, direccion, correo, telefono, identificacion) = cliente
+
+            print("Valores actuales:")
+            print(f"Nombre: {nombre}")
+            print(f"Dirección: {direccion}")
+            print(f"Correo: {correo}")
+            print(f"Teléfono: {telefono}")
+            if tipo_cliente == '1':
+                print(f"Cédula: {identificacion}")
+            else:
+                print(f"RUC: {identificacion}")
+
+            print("Seleccione el campo que desea editar:")
+            print("1. Nombre")
+            print("2. Dirección")
+            print("3. Correo")
+            print("4. Teléfono")
+            if tipo_cliente == '1':
+                print("5. Cédula")
+            else:
+                print("5. RUC")
+            
+            campo = input("Opción: ")
+
+            nuevo_nombre = nombre
+            nuevo_direccion = direccion
+            nuevo_correo = correo
+            nuevo_telefono = telefono
+            nuevo_identificacion = identificacion
+
+            if campo == '1':
+                nuevo_nombre = input("Ingrese el nuevo nombre: ")
+            elif campo == '2':
+                nuevo_direccion = input("Ingrese la nueva dirección: ")
+            elif campo == '3':
+                nuevo_correo = input("Ingrese el nuevo correo: ")
+            elif campo == '4':
+                nuevo_telefono = input("Ingrese el nuevo teléfono: ")
+            elif campo == '5':
+                nuevo_identificacion = input("Ingrese el nuevo valor (Cédula/RUC): ")
+            else:
+                print("Opción no válida.")
+                continue
+
+            # Llamar al procedimiento almacenado para actualizar
+            if tipo_cliente == '1':
+                cursor.callproc('sp_update_cliente', (id_cliente, nuevo_nombre, nuevo_direccion, nuevo_correo, nuevo_telefono, nuevo_identificacion, None))
+            else:
+                cursor.callproc('sp_update_cliente', (id_cliente, nuevo_nombre, nuevo_direccion, nuevo_correo, nuevo_telefono, None, nuevo_identificacion))
+
             conexion.commit()
+            input("Cliente actualizado exitosamente...")
             cursor.close()
             input("Aplicando cambios... \nPulse enter para continuar...")
+
         elif opc == "4":
             print("\n------\t Eliminar datos de clientes \t------")
-            while True:
-                print("\nSeleccione el tipo de cliente:")
-                print("1. Cliente Natural")
-                print("2. Cliente Empresa")
-                
-                tipo_cliente = input("\nIngrese el número correspondiente al tipo de cliente: ")
-                
-                if tipo_cliente in ['1', '2']:
-                    break
-                else:
-                    print("Selección inválida. Por favor, intente de nuevo.")
-            
             id_cliente = input("Ingrese el ID del cliente: ")
 
-            # Determinar la tabla específica según el tipo de cliente
-            if tipo_cliente == '1':
-                tabla_especifica = "CLIENTE_NATURAL"
-            elif tipo_cliente == '2':
-                tabla_especifica = "CLIENTE_EMPRESA"
-
             try:
-                # Eliminar primero de la tabla específica
-                consulta_especifica = f"DELETE FROM {tabla_especifica} WHERE ID_cliente = %s"
-                cursor.execute(consulta_especifica, (id_cliente,))
-                
-                # Luego eliminar de la tabla CLIENTE
-                consulta_cliente = "DELETE FROM CLIENTE WHERE ID_cliente = %s"
-                cursor.execute(consulta_cliente, (id_cliente,))
-                
-                print(f"Cliente con ID {id_cliente} eliminado correctamente de las tablas CLIENTE y {tabla_especifica}.")
-
-            except mysql.connector.Error as err:
+                cursor.callproc('sp_delete_cliente', (id_cliente,))
+                conexion.commit()
+                input(f"Cliente con ID {id_cliente} eliminado correctamente.")
+            except mysql.connector.Error as err: # type: ignore
                 print(f"Error: {err}")
-                
-            #Aplicar los cambios
-            conexion.commit()
+                conexion.rollback()
+
             cursor.close()
             input("Aplicando cambios... \nPulse enter para continuar...")
+
         elif opc == "5":
             cursor.close()
             input("\nRegresando al menú principal... \nPresione enter para continuar...")
