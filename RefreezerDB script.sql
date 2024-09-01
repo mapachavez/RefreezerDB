@@ -869,3 +869,10 @@ BEGIN
     SELECT 'Inventario eliminado correctamente';
 END //
 DELIMITER ;
+
+-- Añadir por lo menos 5 usuarios y especificar por lo menos 2 permisos por usuario
+CREATE USER 'usuario1'@'localhost' IDENTIFIED BY 'p@ssw0rd1';
+CREATE USER 'usuario2'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
+CREATE USER 'usuario3'@'localhost' IDENTIFIED BY 'p@$sw0rD3';
+CREATE USER 'usuario4'@'localhost' IDENTIFIED BY 'p@ssW0Rd4';
+CREATE USER 'usuario5'@'localhost' IDENTIFIED BY 'pa$sw0rd5';
