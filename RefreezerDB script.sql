@@ -381,6 +381,7 @@ INSERT INTO INVENTARIO_PROVEEDOR VALUES
 
 
 -- triggers 
+DELIMITER /
 CREATE TRIGGER tr_actualizar_stock_inventario
 AFTER INSERT ON SERVICIO_MATERIAL
 FOR EACH ROW
@@ -401,18 +402,21 @@ BEGIN
         SET Stock = Stock - NEW.cantidad_usada
         WHERE ID_Inventario = (SELECT ID_Inventario FROM MATERIAL WHERE ID_Material = NEW.ID_Material);
     END IF;
-END;
+END /
+DELIMITER;
 
 -- el siguiente es para validar fechas en la tabla de proformas
+DELIMITER /
 CREATE TRIGGER tg_valida_fechas_proforma
 BEFORE INSERT ON PROFORMA
 FOR EACH ROW
 BEGIN
-    IF NEW.fechaemision > NEW.visita_fecha THEN
+    IF NEW.fecha_emision > NEW.visita_fecha THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La fecha de emisión no puede ser posterior a la fecha de visita';
     END IF;
-END;
+END /
+DELIMITER ;
 
 -- reportes 
 
@@ -732,3 +736,217 @@ BEGIN
     SELECT 'Servicio eliminado correctamente de todas las tablas relacionadas';
 END //
 DELIMITER ;
+
+-- sp para insertar proformas
+DELIMITER //
+CREATE PROCEDURE sp_insert_proforma(
+    IN p_fecha_emision DATE,
+    IN p_costo_mano_obra DECIMAL(10,2),
+    IN p_subtotal DECIMAL(10,2),
+    IN p_estado_aprobacion VARCHAR(50),
+    IN p_calle VARCHAR(100),
+    IN p_manzana VARCHAR(50),
+    IN p_ciudad VARCHAR(100),
+    IN p_visita_fecha DATE,
+    IN p_visita_hora TIME,
+    IN p_visita_observacion TEXT,
+    IN p_id_proyecto INT,
+    IN p_id_cliente INT
+)
+BEGIN
+    START TRANSACTION;
+
+    INSERT INTO PROFORMA
+    VALUES (
+        0,p_fecha_emision, p_costo_mano_obra, p_subtotal, p_estado_aprobacion, 
+        p_calle, p_manzana, p_ciudad, p_visita_fecha, p_visita_hora, 
+        p_visita_observacion, p_id_proyecto, p_id_cliente
+    );
+    COMMIT;
+    SELECT 'Proforma insertada correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar la proforma
+DELIMITER //
+CREATE PROCEDURE sp_update_proforma(
+    IN p_id_proforma INT,
+    IN p_fecha_emision DATE,
+    IN p_costo_mano_obra DECIMAL(10,2),
+    IN p_subtotal DECIMAL(10,2),
+    IN p_estado_aprobacion VARCHAR(50),
+    IN p_calle VARCHAR(100),
+    IN p_manzana VARCHAR(50),
+    IN p_ciudad VARCHAR(100),
+    IN p_visita_fecha DATE,
+    IN p_visita_hora TIME,
+    IN p_visita_observacion TEXT
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE PROFORMA 
+    SET 
+        fecha_emision = p_fecha_emision,
+        costo_mano_obra = p_costo_mano_obra,
+        subtotal = p_subtotal,
+        estado_aprobacion = p_estado_aprobacion,
+        calle = p_calle,
+        manzana = p_manzana,
+        ciudad = p_ciudad,
+        visita_fecha = p_visita_fecha,
+        visita_hora = p_visita_hora,
+        visita_observacion = p_visita_observacion
+    WHERE ID_proforma = p_id_proforma;
+    COMMIT;
+    SELECT 'Proforma actualizada correctamente';
+END //
+DELIMITER ;
+
+-- sp para eliminar proformas 
+DELIMITER //
+CREATE PROCEDURE sp_delete_proforma(
+    IN p_id_proforma INT
+)
+BEGIN
+    START TRANSACTION;
+
+    DELETE FROM PROFORMA WHERE ID_proforma = p_id_proforma;
+    COMMIT;
+    SELECT 'Proforma eliminada correctamente';
+END //
+DELIMITER ;
+
+-- tabla Inventario
+-- sp para insertar inventario
+DELIMITER //
+CREATE PROCEDURE sp_insert_inventario(
+    IN p_nombre VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    START TRANSACTION;
+
+    INSERT INTO INVENTARIO
+    VALUES (0, p_stock, p_nombre, p_marca, p_precio_unidad);
+    COMMIT;
+    SELECT 'Inventario insertado correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar inventario
+DELIMITER //
+CREATE PROCEDURE sp_update_inventario(
+    IN p_id_inventario INT,
+    IN p_nombre VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2),
+    IN p_stock INT
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE INVENTARIO 
+    SET Stock = p_stock, nombre = p_nombre, marca = p_marca, precio_unidad = p_precio_unidad
+    WHERE ID_Inventario = p_id_inventario;
+    COMMIT;
+    SELECT 'Inventario actualizado correctamente';
+END //
+DELIMITER ;
+
+-- sp para eliminar inventario
+DELIMITER //
+CREATE PROCEDURE sp_delete_inventario(
+    IN p_id_inventario INT
+)
+BEGIN
+    START TRANSACTION;
+    
+    DELETE FROM INVENTARIO WHERE ID_Inventario = p_id_inventario;
+    COMMIT;
+    SELECT 'Inventario eliminado correctamente';
+END //
+DELIMITER ;
+
+-- tabla material
+DELIMITER //
+CREATE PROCEDURE sp_insert_material(
+    IN p_descripcion VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2)
+)
+BEGIN
+    DECLARE id_inventario INT;
+
+    SELECT i.ID_Inventario INTO id_inventario
+    FROM INVENTARIO i
+    WHERE i.nombre = p_descripcion AND i.marca = p_marca;
+
+    IF id_inventario IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se encontró el inventario especificado';
+    ELSE
+        START TRANSACTION;
+
+        INSERT INTO MATERIAL
+        VALUES (0, p_descripcion, p_marca, p_precio_unidad, id_inventario);
+        COMMIT;
+        SELECT 'Material insertado correctamente';
+    END IF;
+END //
+DELIMITER ;
+
+-- sp para actualizar material
+DELIMITER //
+CREATE PROCEDURE sp_update_material(
+    IN p_id_material INT,
+    IN p_descripcion VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2)
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE MATERIAL 
+    SET descripcion = p_descripcion, marca = p_marca, precio_unidad = p_precio_unidad
+    WHERE ID_Material = p_id_material;
+    COMMIT;
+    SELECT 'Material actualizado correctamente';
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE sp_delete_material(
+    IN p_id_material INT
+)
+BEGIN
+    START TRANSACTION;
+
+    DELETE FROM MATERIAL WHERE ID_Material = p_id_material;
+    COMMIT;
+    SELECT 'Material eliminado correctamente';
+END //
+DELIMITER ;
+
+-- Añadir por lo menos 5 usuarios y especificar por lo menos 2 permisos por usuario
+CREATE USER 'usuario1'@'localhost' IDENTIFIED BY 'p@ssw0rd1';
+CREATE USER 'usuario2'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
+CREATE USER 'usuario3'@'localhost' IDENTIFIED BY 'p@$sw0rD3';
+CREATE USER 'usuario4'@'localhost' IDENTIFIED BY 'p@ssW0Rd4';
+CREATE USER 'usuario5'@'localhost' IDENTIFIED BY 'pa$sw0rd5';
+
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario1'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario2'@'localhost';
+GRANT SELECT, DELETE ON refreezerdb.* TO 'usuario3'@'localhost';
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario4'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario5'@'localhost';
+
+-- Debe existir por lo menos 1 permiso 1 a un stored procedure
+GRANT EXECUTE ON PROCEDURE refreezerdb.sp_insert_cliente TO 'usuario1'@'localhost';
+-- Debe existir por lo menos 2 permisos a vistas
+GRANT SELECT, UPDATE ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
+GRANT SELECT ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
+GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
