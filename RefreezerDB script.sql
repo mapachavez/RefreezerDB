@@ -870,6 +870,66 @@ BEGIN
 END //
 DELIMITER ;
 
+-- tabla material
+DELIMITER //
+CREATE PROCEDURE sp_insert_material(
+    IN p_descripcion VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2)
+)
+BEGIN
+    DECLARE id_inventario INT;
+
+    SELECT i.ID_Inventario INTO id_inventario
+    FROM INVENTARIO i
+    WHERE i.nombre = p_descripcion AND i.marca = p_marca;
+
+    IF id_inventario IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No se encontró el inventario especificado';
+    ELSE
+        START TRANSACTION;
+
+        INSERT INTO MATERIAL
+        VALUES (0, p_descripcion, p_marca, p_precio_unidad, id_inventario);
+        COMMIT;
+        SELECT 'Material insertado correctamente';
+    END IF;
+END //
+DELIMITER ;
+
+-- sp para actualizar material
+DELIMITER //
+CREATE PROCEDURE sp_update_material(
+    IN p_id_material INT,
+    IN p_descripcion VARCHAR(100),
+    IN p_marca VARCHAR(50),
+    IN p_precio_unidad DECIMAL(10,2)
+)
+BEGIN
+    START TRANSACTION;
+
+    UPDATE MATERIAL 
+    SET descripcion = p_descripcion, marca = p_marca, precio_unidad = p_precio_unidad
+    WHERE ID_Material = p_id_material;
+    COMMIT;
+    SELECT 'Material actualizado correctamente';
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE sp_delete_material(
+    IN p_id_material INT
+)
+BEGIN
+    START TRANSACTION;
+
+    DELETE FROM MATERIAL WHERE ID_Material = p_id_material;
+    COMMIT;
+    SELECT 'Material eliminado correctamente';
+END //
+DELIMITER ;
+
 -- Añadir por lo menos 5 usuarios y especificar por lo menos 2 permisos por usuario
 CREATE USER 'usuario1'@'localhost' IDENTIFIED BY 'p@ssw0rd1';
 CREATE USER 'usuario2'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
