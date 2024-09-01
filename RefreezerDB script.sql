@@ -876,3 +876,9 @@ CREATE USER 'usuario2'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
 CREATE USER 'usuario3'@'localhost' IDENTIFIED BY 'p@$sw0rD3';
 CREATE USER 'usuario4'@'localhost' IDENTIFIED BY 'p@ssW0Rd4';
 CREATE USER 'usuario5'@'localhost' IDENTIFIED BY 'pa$sw0rd5';
+
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario1'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario2'@'localhost';
+GRANT SELECT, DELETE ON refreezerdb.* TO 'usuario3'@'localhost';
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario4'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario5'@'localhost';
