@@ -381,6 +381,7 @@ INSERT INTO INVENTARIO_PROVEEDOR VALUES
 
 
 -- triggers 
+DELIMITER /
 CREATE TRIGGER tr_actualizar_stock_inventario
 AFTER INSERT ON SERVICIO_MATERIAL
 FOR EACH ROW
@@ -401,18 +402,21 @@ BEGIN
         SET Stock = Stock - NEW.cantidad_usada
         WHERE ID_Inventario = (SELECT ID_Inventario FROM MATERIAL WHERE ID_Material = NEW.ID_Material);
     END IF;
-END;
+END /
+DELIMITER;
 
 -- el siguiente es para validar fechas en la tabla de proformas
+DELIMITER /
 CREATE TRIGGER tg_valida_fechas_proforma
 BEFORE INSERT ON PROFORMA
 FOR EACH ROW
 BEGIN
-    IF NEW.fechaemision > NEW.visita_fecha THEN
+    IF NEW.fecha_emision > NEW.visita_fecha THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'La fecha de emisión no puede ser posterior a la fecha de visita';
     END IF;
-END;
+END /
+DELIMITER ;
 
 -- reportes 
 
