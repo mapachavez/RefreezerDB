@@ -6,9 +6,9 @@ def conectar():
     try:
         conexion = mysql.connector.connect(
             host='localhost', # Cambiar por la dirección de tu servidor
-            port = 9999, # Cambiar por el puerto de tu servidor
+            port = 3306, # Cambiar por el puerto de tu servidor
             user='root',   # Cambiar por tu nombre de usuario
-            password='lol',  # Cambiar por tu contraseña
+            password='admin',  # Cambiar por tu contraseña
             database='refreezerdb'
             )
         

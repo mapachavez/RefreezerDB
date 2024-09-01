@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def gestionClientes(conexion):
     opc = ""
     while (opc != "5"):
@@ -266,9 +269,10 @@ def gestionProformas(conexion):
             fecha_emision = input("Ingrese la fecha de emisión (YYYY-MM-DD): ")
             costo_mano_obra = input("Ingrese el costo de mano de obra: ")
             subtotal = input("Ingrese el subtotal: ")
-            
+
             while True:
-                estado_aprobacion = input("Ingrese el estado de aprobación (Aprobado/No Aprobado) [Enter para 'No Aprobado']: ")
+                estado_aprobacion = input(
+                    "Ingrese el estado de aprobación (Aprobado/No Aprobado) [Enter para 'No Aprobado']: ")
                 if estado_aprobacion == "":
                     estado_aprobacion = "No Aprobado"
                 if estado_aprobacion in ["Aprobado", "No Aprobado"]:
@@ -281,17 +285,17 @@ def gestionProformas(conexion):
             visita_fecha = input("Ingrese la fecha de visita (YYYY-MM-DD): ")
             visita_hora = input("Ingrese la hora de visita (HH:MM:SS): ")
             visita_observacion = input("Ingrese observaciones de la visita (puede dejarlo vacío): ")
-
             id_cliente = input("Ingrese el ID del cliente: ")
             id_proyecto = input("Ingrese el ID del proyecto (opcional): ")
 
-            query = """
-            INSERT INTO PROFORMA (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion, ID_Cliente, ID_Proyecto)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(query, (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion, id_cliente, id_proyecto if id_proyecto else None))
+            cursor.callproc('sp_insert_proforma', (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion,
+                                                   calle, manzana, ciudad, visita_fecha, visita_hora,
+                                                   visita_observacion, id_proyecto or None, id_cliente))
+
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
+
             conexion.commit()
-            input("Proforma añadida exitosamente.")
 
         elif opcion == '2':
             # Consultar proformas (mostrar todas)
@@ -313,21 +317,44 @@ def gestionProformas(conexion):
                     visita_fecha = row[8].strftime("%Y-%m-%d")
                     visita_hora = str(row[9])  # Convertir TIME a string
                     visita_observacion = row[10] if row[10] else 'N/A'
-                    id_cliente = row[11]
-                    id_proyecto = row[12] if row[12] else 'N/A'
+                    id_proyecto = row[11] if row[11] else 'N/A'
+                    id_cliente = row[12]
 
                     print(f"ID: {id_proforma} | Fecha Emisión: {fecha_emision} | Costo Mano de Obra: {costo_mano_obra} | Subtotal: {subtotal} | "
                           f"Estado Aprobación: {estado_aprobacion} | Dirección: {calle}, {manzana}, {ciudad} | "
                           f"Fecha Visita: {visita_fecha} | Hora Visita: {visita_hora} | Observaciones: {visita_observacion} | "
-                          f"ID Cliente: {id_cliente} | ID Proyecto: {id_proyecto}\n")
+                          f"ID Proyecto: {id_proyecto} | ID Cliente: {id_cliente}\n")
                 input("Consulta realizada correctamente...")
             else:
                 print("No se encontraron proformas.")
-            
 
         elif opcion == '3':
-            # Editar proforma
             id_proforma = input("Ingrese el ID de la proforma que desea editar: ")
+
+            cursor.execute(
+                "SELECT fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha, visita_hora, visita_observacion FROM PROFORMA WHERE ID_Proforma = %s",
+                (id_proforma,))
+            proforma = cursor.fetchone()
+
+            if proforma is None:
+                print("Proforma no encontrada.")
+                continue
+
+            (fecha_emision, costo_mano_obra, subtotal, estado_aprobacion, calle, manzana, ciudad, visita_fecha,
+             visita_hora, visita_observacion) = proforma
+
+            print("Valores actuales:")
+            print(f"Fecha de Emisión: {fecha_emision}")
+            print(f"Costo Mano de Obra: {costo_mano_obra}")
+            print(f"Subtotal: {subtotal}")
+            print(f"Estado de Aprobación: {estado_aprobacion}")
+            print(f"Calle: {calle}")
+            print(f"Manzana: {manzana}")
+            print(f"Ciudad: {ciudad}")
+            print(f"Fecha de Visita: {visita_fecha}")
+            print(f"Hora de Visita: {visita_hora}")
+            print(f"Observaciones de la Visita: {visita_observacion}")
+
             print("Seleccione el campo que desea editar:")
             print("1. Fecha de Emisión")
             print("2. Costo Mano de Obra")
@@ -339,67 +366,85 @@ def gestionProformas(conexion):
             print("8. Fecha de Visita")
             print("9. Hora de Visita")
             print("10. Observaciones de la Visita")
-            print("11. ID Cliente")
-            print("12. ID Proyecto")
             campo = input("Opción: ")
+
+            nuevo_fecha_emision = fecha_emision
+            nuevo_costo_mano_obra = costo_mano_obra
+            nuevo_subtotal = subtotal
+            nuevo_estado_aprobacion = estado_aprobacion
+            nuevo_calle = calle
+            nuevo_manzana = manzana
+            nuevo_ciudad = ciudad
+            nuevo_visita_fecha = visita_fecha
+            nuevo_visita_hora = visita_hora
+            nuevo_visita_observacion = visita_observacion
 
             if campo == '1':
                 nuevo_valor = input("Ingrese la nueva fecha de emisión (YYYY-MM-DD): ")
-                query = "UPDATE PROFORMA SET fecha_emision = %s WHERE ID_Proforma = %s"
+                nuevo_fecha_emision = datetime.strptime(nuevo_valor, '%Y-%m-%d').date()
             elif campo == '2':
                 nuevo_valor = input("Ingrese el nuevo costo de mano de obra: ")
-                query = "UPDATE PROFORMA SET costo_mano_obra = %s WHERE ID_Proforma = %s"
+                nuevo_costo_mano_obra = float(nuevo_valor)
             elif campo == '3':
                 nuevo_valor = input("Ingrese el nuevo subtotal: ")
-                query = "UPDATE PROFORMA SET subtotal = %s WHERE ID_Proforma = %s"
+                nuevo_subtotal = float(nuevo_valor)
             elif campo == '4':
                 while True:
-                    nuevo_valor = input("Ingrese el nuevo estado de aprobación (Aprobado/No Aprobado) [Enter para 'No Aprobado']: ")
+                    nuevo_valor = input(
+                        "Ingrese el nuevo estado de aprobación (Aprobado/No Aprobado) [Enter para 'No Aprobado']: ")
                     if nuevo_valor == "":
-                        nuevo_valor = "No Aprobado"
+                        nuevo_estado_aprobacion = "No Aprobado"
                     if nuevo_valor in ["Aprobado", "No Aprobado"]:
+                        nuevo_estado_aprobacion = nuevo_valor
                         break
                     print("Entrada no válida. Intente nuevamente.")
-                query = "UPDATE PROFORMA SET estado_aprobacion = %s WHERE ID_Proforma = %s"
             elif campo == '5':
                 nuevo_valor = input("Ingrese la nueva calle: ")
-                query = "UPDATE PROFORMA SET calle = %s WHERE ID_Proforma = %s"
+                nuevo_calle = nuevo_valor
             elif campo == '6':
                 nuevo_valor = input("Ingrese la nueva manzana: ")
-                query = "UPDATE PROFORMA SET manzana = %s WHERE ID_Proforma = %s"
+                nuevo_manzana = nuevo_valor
             elif campo == '7':
                 nuevo_valor = input("Ingrese la nueva ciudad: ")
-                query = "UPDATE PROFORMA SET ciudad = %s WHERE ID_Proforma = %s"
+                nuevo_ciudad = nuevo_valor
             elif campo == '8':
                 nuevo_valor = input("Ingrese la nueva fecha de visita (YYYY-MM-DD): ")
-                query = "UPDATE PROFORMA SET visita_fecha = %s WHERE ID_Proforma = %s"
+                nuevo_visita_fecha = datetime.strptime(nuevo_valor, '%Y-%m-%d').date()
             elif campo == '9':
                 nuevo_valor = input("Ingrese la nueva hora de visita (HH:MM:SS): ")
-                query = "UPDATE PROFORMA SET visita_hora = %s WHERE ID_Proforma = %s"
+                nuevo_visita_hora = datetime.strptime(nuevo_valor, '%H:%M:%S').time()
             elif campo == '10':
                 nuevo_valor = input("Ingrese las nuevas observaciones de la visita: ")
-                query = "UPDATE PROFORMA SET visita_observacion = %s WHERE ID_Proforma = %s"
-            elif campo == '11':
-                nuevo_valor = input("Ingrese el nuevo ID del cliente: ")
-                query = "UPDATE PROFORMA SET ID_Cliente = %s WHERE ID_Proforma = %s"
-            elif campo == '12':
-                nuevo_valor = input("Ingrese el nuevo ID del proyecto (puede dejarlo vacío): ")
-                query = "UPDATE PROFORMA SET ID_Proyecto = %s WHERE ID_Proforma = %s"
+                nuevo_visita_observacion = nuevo_valor
             else:
                 print("Opción no válida.")
                 continue
 
-            cursor.execute(query, (nuevo_valor, id_proforma))
+            cursor.callproc('sp_update_proforma', [
+                id_proforma,
+                nuevo_fecha_emision,
+                nuevo_costo_mano_obra,
+                nuevo_subtotal,
+                nuevo_estado_aprobacion,
+                nuevo_calle,
+                nuevo_manzana,
+                nuevo_ciudad,
+                nuevo_visita_fecha,
+                nuevo_visita_hora,
+                nuevo_visita_observacion
+            ])
             conexion.commit()
             input("Proforma actualizada exitosamente...")
-
         elif opcion == '4':
-            # Eliminar proforma
+
             id_proforma = input("Ingrese el ID de la proforma que desea eliminar: ")
-            query = "DELETE FROM PROFORMA WHERE ID_Proforma = %s"
-            cursor.execute(query, (id_proforma,))
+            cursor.callproc('sp_delete_proforma', (id_proforma,))
+
+            for result in cursor.stored_results():
+                print(result.fetchone()[0])
+
             conexion.commit()
-            input("Proforma eliminada exitosamente...")
+            input("Proforma eliminada exitosamente.")
 
         elif opcion == '5':
             # Salir
