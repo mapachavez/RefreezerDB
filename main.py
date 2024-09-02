@@ -9,7 +9,7 @@ def conectar():
             port = 3306, # Cambiar por el puerto de tu servidor
             user='root',   # Cambiar por tu nombre de usuario
             password='admin',  # Cambiar por tu contraseña
-            database='refreezerdbpruebas'
+            database='RefreezerDB'
             )
         
         if conexion.is_connected():
