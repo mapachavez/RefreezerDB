@@ -597,7 +597,7 @@ def gestionServicios(conexion):
         if opcion == '1':
             # Añadir nuevo servicio
             descripcion = input("Ingrese la descripción del servicio: ")
-            costo_servicio = input("Ingrese el costo del servicio: ")
+            costo_servicio = float(input("Ingrese el costo del servicio: "))
 
             while True:
                 estado = input("Ingrese el estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
@@ -607,19 +607,27 @@ def gestionServicios(conexion):
                     break
                 print("Entrada no válida. Intente nuevamente.")
 
-            garantia = input("Ingrese la garantía (en meses): ")
+            garantia = int(input("Ingrese la garantía (en meses): "))
             fecha_inicio = input("Ingrese la fecha de inicio (YYYY-MM-DD): ")
             fecha_fin = input("Ingrese la fecha de fin (YYYY-MM-DD): ")
-            id_cliente = input("Ingrese el ID del cliente: ")
+            id_cliente = int(input("Ingrese el ID del cliente: "))
+            id_proforma = int(input("Ingrese el ID de la proforma: "))  # Agregado para el procedimiento
 
-            query = """
-            INSERT INTO SERVICIO (descripcion, costo_servicio, estado, garantia, Fecha_inicio, Fecha_fin, ID_cliente)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(query, (descripcion, costo_servicio, estado, garantia, fecha_inicio, fecha_fin, id_cliente))
-            conexion.commit()
+            # Llamar al procedimiento almacenado para insertar servicio
+            cursor.callproc('sp_insert_servicio', (descripcion, costo_servicio, estado, garantia, fecha_inicio, fecha_fin, id_cliente, id_proforma))
 
-            id_servicio = cursor.lastrowid
+            cursor.execute("SELECT @id_servicio := LAST_INSERT_ID();")
+            result = cursor.fetchone()  # fetchone() para obtener la primera fila
+
+            cursor.execute("SELECT LAST_INSERT_ID();")
+            result = cursor.fetchone()
+            id_servicio = result[0] if result else None
+
+            if id_servicio:
+                print("Servicio insertado correctamente con ID:", id_servicio)
+            else:
+                print("Error al insertar el servicio o no se generó el ID.")
+                continue
 
             print("\nSeleccione el tipo de servicio que desea añadir:")
             print("1. Diseño y Fabricación")
@@ -630,43 +638,22 @@ def gestionServicios(conexion):
 
             if tipo_servicio == '1':
                 tipo_diseno = input("Ingrese el tipo de diseño: ")
-                query_tipo = """
-                INSERT INTO DISEÑO_Y_FABRICACION (ID_Servicio, tipo_diseno)
-                VALUES (%s, %s)
-                """
-                cursor.execute(query_tipo, (id_servicio, tipo_diseno))
-
+                cursor.callproc('sp_insert_diseno_y_fabricacion', (id_servicio, tipo_diseno))
             elif tipo_servicio == '2':
                 tipo_mantenimiento = input("Ingrese el tipo de mantenimiento: ")
                 name_unidad_maquinaria = input("Ingrese el nombre de la unidad/maquinaria: ")
-                query_tipo = """
-                INSERT INTO MANTENIMIENTO (ID_Servicio, Tipo_Mantenimiento, Name_Unidad_Maquinaria)
-                VALUES (%s, %s, %s)
-                """
-                cursor.execute(query_tipo, (id_servicio, tipo_mantenimiento, name_unidad_maquinaria))
-
+                cursor.callproc('sp_insert_mantenimiento', (id_servicio, tipo_mantenimiento, name_unidad_maquinaria))
             elif tipo_servicio == '3':
                 tipo_instalacion = input("Ingrese el tipo de instalación: ")
-                query_tipo = """
-                INSERT INTO INSTALACION_Y_MONTAJE (ID_Servicio, tipo_instalacion)
-                VALUES (%s, %s)
-                """
-                cursor.execute(query_tipo, (id_servicio, tipo_instalacion))
-
+                cursor.callproc('sp_insert_instalacion_y_montaje', (id_servicio, tipo_instalacion))
             elif tipo_servicio == '4':
                 tipo_servicio_tecnico = input("Ingrese el tipo de servicio técnico: ")
-                query_tipo = """
-                INSERT INTO SERVICIO_TECNICO (ID_Servicio, tipo_servicio)
-                VALUES (%s, %s)
-                """
-                cursor.execute(query_tipo, (id_servicio, tipo_servicio_tecnico))
-
+                cursor.callproc('sp_insert_servicio_tecnico', (id_servicio, tipo_servicio_tecnico))
             else:
                 print("Opción no válida. Servicio no registrado en una tabla específica.")
                 continue
 
             conexion.commit()
-            input("Servicio añadido exitosamente.")
 
         elif opcion == '2':
             # Consultar servicios en general de la tabla servicio
@@ -697,100 +684,176 @@ def gestionServicios(conexion):
             # modificar servicio
             id_servicio = input("Ingrese el ID del servicio que desea editar: ")
 
-            print("\nSeleccione el tipo de servicio que desea editar:")
-            print("1. Diseño y Fabricación")
-            print("2. Mantenimiento")
-            print("3. Instalación y Montaje")
-            print("4. Servicio Técnico")
-            tipo_servicio = input("Ingrese el numero de la opcion: ")
+            # Obtener los valores actuales del servicio
+            cursor.execute("SELECT descripcion, costo_servicio, estado, garantia, Fecha_inicio, Fecha_fin, ID_cliente FROM SERVICIO WHERE ID_Servicio = %s", (id_servicio,))
+            servicio_actual = cursor.fetchone()
 
-            if tipo_servicio == '1':
-                nuevo_tipo_diseno = input("Ingrese el nuevo tipo de diseño: ")
-                query_tipo = "UPDATE DISEÑO_Y_FABRICACION SET tipo_diseno = %s WHERE ID_Servicio = %s"
-                cursor.execute(query_tipo, (nuevo_tipo_diseno, id_servicio))
+            if servicio_actual:
+                descripcion_actual, costo_servicio_actual, estado_actual, garantia_actual, fecha_inicio_actual, fecha_fin_actual, id_cliente_actual = servicio_actual
 
-            elif tipo_servicio == '2':
-                nuevo_tipo_mantenimiento = input("Ingrese el nuevo tipo de mantenimiento: ")
-                nuevo_name_unidad_maquinaria = input("Ingrese el nuevo nombre de la unidad/maquinaria: ")
-                query_tipo = """
-                UPDATE MANTENIMIENTO 
-                SET Tipo_Mantenimiento = %s, Name_Unidad_Maquinaria = %s 
-                WHERE ID_Servicio = %s
-                """
-                cursor.execute(query_tipo, (nuevo_tipo_mantenimiento, nuevo_name_unidad_maquinaria, id_servicio))
+                print("Valores actuales:")
+                print(f"Descripción: {descripcion_actual}")
+                print(f"Costo del Servicio: {costo_servicio_actual:.2f}")
+                print(f"Estado: {estado_actual}")
+                print(f"Garantía: {garantia_actual} meses")
+                print(f"Fecha de Inicio: {fecha_inicio_actual}")
+                print(f"Fecha de Fin: {fecha_fin_actual}")
+                print(f"ID Cliente: {id_cliente_actual}")
 
-            elif tipo_servicio == '3':
-                nuevo_tipo_instalacion = input("Ingrese el nuevo tipo de instalación: ")
-                query_tipo = "UPDATE INSTALACION_Y_MONTAJE SET tipo_instalacion = %s WHERE ID_Servicio = %s"
-                cursor.execute(query_tipo, (nuevo_tipo_instalacion, id_servicio))
+                print("\nSeleccione el tipo de servicio que desea editar:")
+                print("1. Diseño y Fabricación")
+                print("2. Mantenimiento")
+                print("3. Instalación y Montaje")
+                print("4. Servicio Técnico")
+                tipo_servicio = input("Ingrese el número de la opción: ")
 
-            elif tipo_servicio == '4':
-                nuevo_tipo_servicio_tecnico = input("Ingrese el nuevo tipo de servicio técnico: ")
-                query_tipo = "UPDATE SERVICIO_TECNICO SET tipo_servicio = %s WHERE ID_Servicio = %s"
-                cursor.execute(query_tipo, (nuevo_tipo_servicio_tecnico, id_servicio))
+                if tipo_servicio == '1':
 
+                    cursor.execute("SELECT tipo_diseno FROM DISEÑO_Y_FABRICACION WHERE ID_Servicio = %s", (id_servicio,))
+                    (tipo_diseno_actual,) = cursor.fetchone()
+                    
+                    print("Valores actuales:")
+                    print(f"Tipo de diseño: {tipo_diseno_actual}")
+
+                    nuevo_tipo_diseno = input(f"Ingrese el nuevo tipo de diseño [Enter para mantener '{tipo_diseno_actual}']: ")
+                    if not nuevo_tipo_diseno:
+                        nuevo_tipo_diseno = tipo_diseno_actual
+
+                    cursor.callproc('sp_update_diseno_y_fabricacion', (id_servicio, nuevo_tipo_diseno))
+                    conexion.commit()
+
+                    for result in cursor.stored_results():
+                        print(result.fetchone()[0])
+
+                elif tipo_servicio == '2':
+
+                    cursor.execute("SELECT tipo_mantenimiento, name_unidad_maquinaria FROM MANTENIMIENTO WHERE ID_Servicio = %s", (id_servicio,))
+                    (tipo_mantenimiento_actual, name_unidad_maquinaria_actual) = cursor.fetchone()
+
+                    print("Valores actuales:")
+                    print(f"Tipo de mantenimiento: {tipo_mantenimiento_actual}")
+                    print(f"Nombre de la unidad/maquinaria: {name_unidad_maquinaria_actual}")
+
+                    nuevo_tipo_mantenimiento = input(f"Ingrese el nuevo tipo de mantenimiento [Enter para mantener '{tipo_mantenimiento_actual}']: ")
+                    if not nuevo_tipo_mantenimiento:
+                        nuevo_tipo_mantenimiento = tipo_mantenimiento_actual  
+
+                    nuevo_name_unidad_maquinaria = input(f"Ingrese el nuevo nombre de la unidad/maquinaria [Enter para mantener '{name_unidad_maquinaria_actual}']: ")
+                    if not nuevo_name_unidad_maquinaria:
+                        nuevo_name_unidad_maquinaria = name_unidad_maquinaria_actual  
+
+                    cursor.callproc('sp_update_mantenimiento', (id_servicio, nuevo_tipo_mantenimiento, nuevo_name_unidad_maquinaria))
+                    conexion.commit()
+
+                    for result in cursor.stored_results():
+                        print(result.fetchone()[0])
+
+                elif tipo_servicio == '3':
+                    
+                    cursor.execute("SELECT tipo_instalacion FROM INSTALACION_Y_MONTAJE WHERE ID_Servicio = %s", (id_servicio,))
+                    (tipo_instalacion_actual,) = cursor.fetchone()
+
+                    print("Valores actuales:")
+                    print(f"Tipo de instalación: {tipo_instalacion_actual}")
+
+                    nuevo_tipo_instalacion = input(f"Ingrese el nuevo tipo de instalación [Enter para mantener '{tipo_instalacion_actual}']: ")
+                    if not nuevo_tipo_instalacion:
+                        nuevo_tipo_instalacion = tipo_instalacion_actual 
+
+                    cursor.callproc('sp_update_instalacion_y_montaje', (id_servicio, nuevo_tipo_instalacion))
+                    conexion.commit()
+
+                    for result in cursor.stored_results():
+                        print(result.fetchone()[0])
+
+                elif tipo_servicio == '4':
+                    
+                    cursor.execute("SELECT tipo_servicio_tecnico FROM SERVICIO_TECNICO WHERE ID_Servicio = %s", (id_servicio,))
+                    (tipo_servicio_tecnico_actual,) = cursor.fetchone()
+
+                    print("Valores actuales:")
+                    print(f"Tipo de servicio técnico: {tipo_servicio_tecnico_actual}")
+
+                    nuevo_tipo_servicio_tecnico = input(f"Ingrese el nuevo tipo de servicio técnico [Enter para mantener '{tipo_servicio_tecnico_actual}']: ")
+                    if not nuevo_tipo_servicio_tecnico:
+                        nuevo_tipo_servicio_tecnico = tipo_servicio_tecnico_actual
+
+                    cursor.callproc('sp_update_servicio_tecnico', (id_servicio, nuevo_tipo_servicio_tecnico))
+                    conexion.commit()
+
+                    for result in cursor.stored_results():
+                        print(result.fetchone()[0])
+
+                else:
+                    print("Opción no válida.")
+
+                print("Seleccione el campo que desea editar:")
+                print("1. Descripción")
+                print("2. Costo del Servicio")
+                print("3. Estado")
+                print("4. Garantía")
+                print("5. Fecha de Inicio")
+                print("6. Fecha de Fin")
+                print("7. ID Cliente")
+                campo = input("Opción: ")
+
+                nuevo_valor_descripcion = descripcion_actual
+                nuevo_valor_costo = costo_servicio_actual
+                nuevo_valor_estado = estado_actual
+                nuevo_valor_garantia = garantia_actual
+                nuevo_valor_fecha_inicio = fecha_inicio_actual
+                nuevo_valor_fecha_fin = fecha_fin_actual
+                nuevo_valor_id_cliente = id_cliente_actual
+
+                if campo == '1':
+                    nuevo_valor_descripcion = input("Ingrese la nueva descripción: ")
+                elif campo == '2':
+                    nuevo_valor_costo = input("Ingrese el nuevo costo del servicio: ")
+                    nuevo_valor_costo = float(nuevo_valor_costo)
+                elif campo == '3':
+                    while True:
+                        nuevo_valor_estado = input("Ingrese el nuevo estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
+                        if nuevo_valor_estado == "":
+                            nuevo_valor_estado = "En progreso"
+                        if nuevo_valor_estado in ["En progreso", "Terminado"]:
+                            break
+                        print("Entrada no válida. Intente nuevamente.")
+                elif campo == '4':
+                    nuevo_valor_garantia = input("Ingrese la nueva garantía (en meses): ")
+                    nuevo_valor_garantia = int(nuevo_valor_garantia)
+                elif campo == '5':
+                    nuevo_valor_fecha_inicio = input("Ingrese la nueva fecha de inicio (YYYY-MM-DD): ")
+                elif campo == '6':
+                    nuevo_valor_fecha_fin = input("Ingrese la nueva fecha de fin (YYYY-MM-DD): ")
+                elif campo == '7':
+                    nuevo_valor_id_cliente = input("Ingrese el nuevo ID del cliente: ")
+                    nuevo_valor_id_cliente = int(nuevo_valor_id_cliente)
+                else:
+                    print("Opción no válida.")
+                    continue
+
+                # Llamar al procedimiento almacenado para actualizar el servicio
+                cursor.callproc('sp_update_servicio', (
+                    id_servicio,
+                    nuevo_valor_descripcion,
+                    nuevo_valor_costo,
+                    nuevo_valor_estado,
+                    nuevo_valor_garantia,
+                    nuevo_valor_fecha_inicio,
+                    nuevo_valor_fecha_fin
+                ))
+                conexion.commit()
+                for result in cursor.stored_results():
+                    print(result.fetchone()[0])
+                input("Servicio actualizado exitosamente...")
             else:
-                print("Opción no válida.")
-                continue
-
-            print("Seleccione el campo que desea editar:")
-            print("1. Descripción")
-            print("2. Costo del Servicio")
-            print("3. Estado")
-            print("4. Garantía")
-            print("5. Fecha de Inicio")
-            print("6. Fecha de Fin")
-            print("7. ID Cliente")
-            campo = input("Opción: ")
-
-            if campo == '1':
-                nuevo_valor = input("Ingrese la nueva descripción: ")
-                query = "UPDATE SERVICIO SET descripcion = %s WHERE ID_Servicio = %s"
-            elif campo == '2':
-                nuevo_valor = input("Ingrese el nuevo costo del servicio: ")
-                query = "UPDATE SERVICIO SET costo_servicio = %s WHERE ID_Servicio = %s"
-            elif campo == '3':
-                while True:
-                    nuevo_valor = input("Ingrese el nuevo estado del servicio (En progreso/Terminado) [Enter para dejarlo 'En progreso']: ")
-                    if nuevo_valor == "":
-                        nuevo_valor = "En progreso"
-                    if nuevo_valor in ["En progreso", "Terminado"]:
-                        break
-                    print("Entrada no válida. Intente nuevamente.")
-                query = "UPDATE SERVICIO SET estado = %s WHERE ID_Servicio = %s"
-            elif campo == '4':
-                nuevo_valor = input("Ingrese la nueva garantía (en meses): ")
-                query = "UPDATE SERVICIO SET garantia = %s WHERE ID_Servicio = %s"
-            elif campo == '5':
-                nuevo_valor = input("Ingrese la nueva fecha de inicio (YYYY-MM-DD): ")
-                query = "UPDATE SERVICIO SET Fecha_inicio = %s WHERE ID_Servicio = %s"
-            elif campo == '6':
-                nuevo_valor = input("Ingrese la nueva fecha de fin (YYYY-MM-DD): ")
-                query = "UPDATE SERVICIO SET Fecha_fin = %s WHERE ID_Servicio = %s"
-            elif campo == '7':
-                nuevo_valor = input("Ingrese el nuevo ID del cliente: ")
-                query = "UPDATE SERVICIO SET ID_cliente = %s WHERE ID_Servicio = %s"
-            else:
-                print("Opción no válida.")
-                continue
-
-            cursor.execute(query, (nuevo_valor, id_servicio))
-            conexion.commit()
-            input("Servicio actualizado exitosamente...")
-
+                print("Servicio no encontrado.")
+                
         elif opcion == '4':
             # Eliminar servicio
             id_servicio = input("Ingrese el ID del servicio que desea eliminar: ")
-            #eliminacion por tablas de servicio especificas
-            tablas_servicios = ["DISEÑO_Y_FABRICACION", "MANTENIMIENTO", "INSTALACION_Y_MONTAJE", "SERVICIO_TECNICO"]
-            for tabla in tablas_servicios:
-                query = f"DELETE FROM {tabla} WHERE ID_Servicio = %s"
-                cursor.execute(query, (id_servicio,))
-            #eliminacion de la tabla servicio general
-            query = "DELETE FROM SERVICIO WHERE ID_Servicio = %s"
-            cursor.execute(query, (id_servicio,))
+            cursor.callproc('sp_delete_servicio', (id_servicio,))
             conexion.commit()
-            input("Servicio eliminado exitosamente de todas las tablas correspondientes...")
 
         elif opcion == '5':
             # Salir
