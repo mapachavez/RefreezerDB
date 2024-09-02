@@ -5,10 +5,10 @@ import funciones as fu
 def conectar():
     try:
         conexion = mysql.connector.connect(
-            host='localhost', # Cambiar por la dirección de tu servidor
+            host='34.29.174.231', # Cambiar por la dirección de tu servidor
             port = 3306, # Cambiar por el puerto de tu servidor
             user='root',   # Cambiar por tu nombre de usuario
-            password='admin',  # Cambiar por tu contraseña
+            password='MrGXrWfMe465HWr',  # Cambiar por tu contraseña
             database='RefreezerDB'
             )
         
