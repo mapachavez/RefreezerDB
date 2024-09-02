@@ -55,7 +55,9 @@ CREATE TABLE SERVICIO (
     Fecha_inicio DATE NOT NULL,
     Fecha_fin DATE,
     ID_Cliente int NOT NULL,
-    FOREIGN KEY (ID_Cliente) REFERENCES CLIENTE(ID_Cliente)
+    ID_Proforma int NOT NULL,
+    FOREIGN KEY (ID_Cliente) REFERENCES CLIENTE(ID_Cliente),
+    FOREIGN KEY (ID_Proforma) REFERENCES PROFORMA(ID_Proforma)
 );
 
 CREATE TABLE EMPLEADO (
@@ -511,21 +513,25 @@ CREATE PROCEDURE sp_update_cliente(
     IN p_direccion VARCHAR(255),
     IN p_correo VARCHAR(100),
     IN p_telefono VARCHAR(10),
-    IN p_cedula VARCHAR(13),
-    IN p_ruc VARCHAR(13)       
+    IN p_cedula VARCHAR(13),  -- Nuevo parámetro para clientes naturales
+    IN p_ruc VARCHAR(13)       -- Nuevo parámetro para clientes empresas
 )
 BEGIN
     START TRANSACTION;
+
+    -- Actualiza los datos del cliente en la tabla CLIENTE
     UPDATE CLIENTE 
     SET nombre = p_nombre, direccion = p_direccion, correo = p_correo, telefono = p_telefono
     WHERE ID_cliente = p_id_cliente;
 
+    -- Actualiza la tabla CLIENTE_NATURAL si el cliente es natural
     IF EXISTS (SELECT * FROM CLIENTE_NATURAL WHERE ID_cliente = p_id_cliente) THEN
         UPDATE CLIENTE_NATURAL 
         SET Cedula = p_cedula
         WHERE ID_cliente = p_id_cliente;
     END IF;
 
+    -- Actualiza la tabla CLIENTE_EMPRESA si el cliente es empresa
     IF EXISTS (SELECT * FROM CLIENTE_EMPRESA WHERE ID_cliente = p_id_cliente) THEN
         UPDATE CLIENTE_EMPRESA 
         SET RUC = p_ruc
@@ -538,19 +544,26 @@ DELIMITER ;
 
 -- procedimiento para eliminacion de cliente
 DELIMITER //
-CREATE PROCEDURE sp_delete_cliente(IN p_id_cliente INT)
+CREATE PROCEDURE sp_delete_cliente(
+    IN p_id_cliente INT
+)
 BEGIN
     START TRANSACTION;
 
+    -- Borra el cliente de la tabla CLIENTE_NATURAL o CLIENTE_EMPRESA
     DELETE FROM CLIENTE_NATURAL WHERE ID_cliente = p_id_cliente;
     DELETE FROM CLIENTE_EMPRESA WHERE ID_cliente = p_id_cliente;
+
+    -- por si las moscas
+    DELETE FROM SERVICIO WHERE ID_cliente = p_id_cliente;
+    -- Borra el cliente de la tabla CLIENTE
     DELETE FROM CLIENTE WHERE ID_cliente = p_id_cliente;
-
     COMMIT;
-
     SELECT 'Cliente eliminado correctamente';
 END //
 DELIMITER ;
+call sp_delete_cliente(11);
+
 
 -- procedimientos para la tabla de servicios
 -- insertar servicio
@@ -566,32 +579,28 @@ CREATE PROCEDURE sp_insert_servicio(
     IN p_id_proforma INT
 )
 BEGIN
+    declare p_id_servicio INT;
     START TRANSACTION;
-
+    
     INSERT INTO SERVICIO     
-    VALUES (0,p_descripcion, p_costo_servicio, p_estado, p_garantia, p_fecha_inicio, p_fecha_fin, p_id_cliente, p_id_proforma);
+    VALUES (0, p_descripcion, p_costo_servicio, p_estado, p_garantia, p_fecha_inicio, p_fecha_fin, p_id_cliente, p_id_proforma);
+    SET p_id_servicio = LAST_INSERT_ID(); 
     COMMIT;
-    SELECT 'Servicio insertado correctamente';
+    SELECT p_id_servicio;
 END //
 DELIMITER ;
 
 -- sp para insertar diseño y fabricacion
 DELIMITER //
 CREATE PROCEDURE sp_insert_diseno_y_fabricacion(
+    IN p_id_servicio INT,
     IN p_diseno TEXT,
     IN p_tipo_diseno TEXT
 )
 BEGIN
-    DECLARE v_id_servicio INT;
-
-    SET v_id_servicio = LAST_INSERT_ID();
     START TRANSACTION;
-    INSERT INTO DISEÑO_Y_FABRICACIÓN (
-        ID_Servicio, diseño, tipo_diseño
-    )
-    VALUES (
-        v_id_servicio, p_diseno, p_tipo_diseno
-    );
+    INSERT INTO DISEÑO_Y_FABRICACIÓN
+    VALUES (p_id_servicio, p_diseno, p_tipo_diseno);
     COMMIT;
     SELECT 'Registro insertado en la tabla Diseño y Fabricación correctamente';
 END //
@@ -600,19 +609,13 @@ DELIMITER ;
 -- sp para insertar un servicio tecnico
 DELIMITER //
 CREATE PROCEDURE sp_insert_servicio_tecnico(
+    IN p_id_servicio INT,
     IN p_tipo_servicio TEXT
 )
 BEGIN
-    DECLARE v_id_servicio INT;
-
-    SET v_id_servicio = LAST_INSERT_ID();
     START TRANSACTION;
-    INSERT INTO SERVICIO_TECNICO (
-        ID_Servicio, tipo_servicio
-    )
-    VALUES (
-        v_id_servicio, p_tipo_servicio
-    );
+    INSERT INTO SERVICIO_TECNICO
+    VALUES (p_id_servicio, p_tipo_servicio);
     COMMIT;
     SELECT 'Registro insertado en la tabla Servicio Técnico correctamente';
 END //
@@ -621,19 +624,13 @@ DELIMITER ;
 -- sp para insertar una instalacion y montaje
 DELIMITER // 
 CREATE PROCEDURE sp_insert_instalacion_y_montaje(
+    IN p_id_servicio INT,
     IN p_tipo_instalacion TEXT
 )
 BEGIN
-    DECLARE v_id_servicio INT;
-
-    SET v_id_servicio = LAST_INSERT_ID();
     START TRANSACTION;
-    INSERT INTO INSTALACION_Y_MONTAJE (
-        ID_Servicio, tipo_instalacion
-    )
-    VALUES (
-        v_id_servicio, p_tipo_instalacion
-    );
+    INSERT INTO INSTALACION_Y_MONTAJE
+    VALUES (p_id_servicio, p_tipo_instalacion);
     COMMIT;
     SELECT 'Registro insertado en la tabla Instalación y Montaje correctamente';
 END //
@@ -642,25 +639,18 @@ DELIMITER ;
 -- sp para insertar un mantenimiento
 DELIMITER //
 CREATE PROCEDURE sp_insert_mantenimiento(
+    IN p_id_servicio INT,
     IN p_tipo_mantenimiento TEXT,
     IN p_name_unidad_maquinaria TEXT
 )
 BEGIN
-    DECLARE v_id_servicio INT;
-
-    SET v_id_servicio = LAST_INSERT_ID();
     START TRANSACTION;
-    INSERT INTO MANTENIMIENTO (
-        ID_Servicio, Tipo_Mantenimiento, Name_Unidad_Maquinaria
-    )
-    VALUES (
-        v_id_servicio, p_tipo_mantenimiento, p_name_unidad_maquinaria
-    );
+    INSERT INTO MANTENIMIENTO
+    VALUES (p_id_servicio, p_tipo_mantenimiento, p_name_unidad_maquinaria);
     COMMIT;
     SELECT 'Registro insertado en la tabla Mantenimiento correctamente';
 END //
 DELIMITER ;
-
 
 -- actualizacion de servicio
 DELIMITER //
@@ -688,6 +678,71 @@ BEGIN
 END //
 DELIMITER ;
 
+-- procedures para actualizar los tipos de servicio
+-- sp para actualizar diseño y fabricación
+DELIMITER //
+CREATE PROCEDURE sp_update_diseno_y_fabricacion(
+    IN p_id_servicio INT,
+    IN p_tipo_diseno TEXT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE DISEÑO_Y_FABRICACION
+    SET tipo_diseno = p_tipo_diseno
+    WHERE ID_Servicio = p_id_servicio;
+    COMMIT;
+    SELECT 'Diseño y Fabricación actualizado correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar mantenimiento
+DELIMITER //
+CREATE PROCEDURE sp_update_mantenimiento(
+    IN p_id_servicio INT,
+    IN p_tipo_mantenimiento TEXT,
+    IN p_name_unidad_maquinaria TEXT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE MANTENIMIENTO
+    SET Tipo_Mantenimiento = p_tipo_mantenimiento, Name_Unidad_Maquinaria = p_name_unidad_maquinaria
+    WHERE ID_Servicio = p_id_servicio;
+    COMMIT;
+    SELECT 'Mantenimiento actualizado correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar instalación y montaje
+DELIMITER //
+CREATE PROCEDURE sp_update_instalacion_y_montaje(
+    IN p_id_servicio INT,
+    IN p_tipo_instalacion TEXT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE INSTALACION_Y_MONTAJE
+    SET tipo_instalacion = p_tipo_instalacion
+    WHERE ID_Servicio = p_id_servicio;
+    COMMIT;
+    SELECT 'Instalación y Montaje actualizado correctamente';
+END //
+DELIMITER ;
+
+-- sp para actualizar servicio técnico
+DELIMITER //
+CREATE PROCEDURE sp_update_servicio_tecnico(
+    IN p_id_servicio INT,
+    IN p_tipo_servicio TEXT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE SERVICIO_TECNICO
+    SET tipo_servicio = p_tipo_servicio
+    WHERE ID_Servicio = p_id_servicio;
+    COMMIT;
+    SELECT 'Servicio Técnico actualizado correctamente';
+END //
+DELIMITER ;
 
 -- eliminar servicio
 DELIMITER //
@@ -701,7 +756,8 @@ BEGIN
     DECLARE id_mantenimiento INT DEFAULT 0;
 
     START TRANSACTION;
-
+    DELETE FROM SERVICIO_MATERIAL WHERE ID_Servicio = p_id_servicio;
+    DELETE FROM EMPLEADO_SERVICIO WHERE ID_Servicio = p_id_servicio;
     -- Verifica si el servicio existe en la tabla DISEÑO_Y_FABRICACIÓN
     SELECT COUNT(*) INTO id_diseño
     FROM DISEÑO_Y_FABRICACION
@@ -737,11 +793,8 @@ BEGIN
     IF id_mantenimiento > 0 THEN
         DELETE FROM MANTENIMIENTO WHERE ID_Servicio = p_id_servicio;
     END IF;
-
-    -- Finalmente, borra el servicio de la tabla SERVICIO
     DELETE FROM SERVICIO WHERE ID_Servicio = p_id_servicio;
     COMMIT;
-
     SELECT 'Servicio eliminado correctamente de todas las tablas relacionadas';
 END //
 DELIMITER ;
@@ -769,8 +822,7 @@ BEGIN
     VALUES (
         0,p_fecha_emision, p_costo_mano_obra, p_subtotal, p_estado_aprobacion, 
         p_calle, p_manzana, p_ciudad, p_visita_fecha, p_visita_hora, 
-        p_visita_observacion, p_id_proyecto, p_id_cliente
-    );
+        p_visita_observacion, p_id_proyecto, p_id_cliente);
     COMMIT;
     SELECT 'Proforma insertada correctamente';
 END //
@@ -819,15 +871,15 @@ CREATE PROCEDURE sp_delete_proforma(
 )
 BEGIN
     START TRANSACTION;
-
+    -- por si las moscas x2
+    DELETE FROM SERVICIO WHERE ID_proforma = p_id_proforma;
+    -- Borra la proforma de la tabla PROFORMA
     DELETE FROM PROFORMA WHERE ID_proforma = p_id_proforma;
     COMMIT;
     SELECT 'Proforma eliminada correctamente';
 END //
 DELIMITER ;
 
--- tabla Inventario
--- sp para insertar inventario
 DELIMITER //
 CREATE PROCEDURE sp_insert_inventario(
     IN p_nombre VARCHAR(100),
@@ -845,7 +897,6 @@ BEGIN
 END //
 DELIMITER ;
 
--- sp para actualizar inventario
 DELIMITER //
 CREATE PROCEDURE sp_update_inventario(
     IN p_id_inventario INT,
@@ -856,7 +907,7 @@ CREATE PROCEDURE sp_update_inventario(
 )
 BEGIN
     START TRANSACTION;
-
+    
     UPDATE INVENTARIO 
     SET Stock = p_stock, nombre = p_nombre, marca = p_marca, precio_unidad = p_precio_unidad
     WHERE ID_Inventario = p_id_inventario;
@@ -865,15 +916,16 @@ BEGIN
 END //
 DELIMITER ;
 
--- sp para eliminar inventario
 DELIMITER //
 CREATE PROCEDURE sp_delete_inventario(
     IN p_id_inventario INT
 )
 BEGIN
     START TRANSACTION;
-    
+	DELETE FROM MATERIAL WHERE ID_Inventario = p_id_inventario;
+    DELETE FROM INVENTARIO_PROVEEDOR WHERE ID_Inventario = p_id_inventario;
     DELETE FROM INVENTARIO WHERE ID_Inventario = p_id_inventario;
+    
     COMMIT;
     SELECT 'Inventario eliminado correctamente';
 END //
@@ -884,30 +936,20 @@ DELIMITER //
 CREATE PROCEDURE sp_insert_material(
     IN p_descripcion VARCHAR(100),
     IN p_marca VARCHAR(50),
-    IN p_precio_unidad DECIMAL(10,2)
+    IN p_precio_unidad DECIMAL(10,2),
+    IN p_id_inventario INT  -- Agregar este parámetro
 )
 BEGIN
-    DECLARE id_inventario INT;
+    START TRANSACTION;
 
-    SELECT i.ID_Inventario INTO id_inventario
-    FROM INVENTARIO i
-    WHERE i.nombre = p_descripcion AND i.marca = p_marca;
-
-    IF id_inventario IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No se encontró el inventario especificado';
-    ELSE
-        START TRANSACTION;
-
-        INSERT INTO MATERIAL
-        VALUES (0, p_descripcion, p_marca, p_precio_unidad, id_inventario);
-        COMMIT;
-        SELECT 'Material insertado correctamente';
-    END IF;
+    INSERT INTO MATERIAL
+    VALUES (0, p_descripcion, p_marca, p_precio_unidad, p_id_inventario);
+    COMMIT;
+    SELECT 'Material insertado correctamente';
 END //
 DELIMITER ;
 
--- sp para actualizar material
+-- sp para actualizar esta wea
 DELIMITER //
 CREATE PROCEDURE sp_update_material(
     IN p_id_material INT,
@@ -933,6 +975,7 @@ CREATE PROCEDURE sp_delete_material(
 BEGIN
     START TRANSACTION;
 
+    DELETE FROM SERVICIO_MATERIAL WHERE ID_Material = p_id_material;
     DELETE FROM MATERIAL WHERE ID_Material = p_id_material;
     COMMIT;
     SELECT 'Material eliminado correctamente';
