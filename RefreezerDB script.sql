@@ -568,7 +568,7 @@ call sp_delete_cliente(11);
 
 -- procedimientos para la tabla de servicios
 -- insertar servicio
-DELIMITER // 
+DELIMITER //
 CREATE PROCEDURE sp_insert_servicio(
     IN p_descripcion TEXT,
     IN p_costo_servicio DECIMAL(10,2),
@@ -580,17 +580,11 @@ CREATE PROCEDURE sp_insert_servicio(
     IN p_id_proforma INT
 )
 BEGIN
-    declare p_id_servicio INT;
-    START TRANSACTION;
-    
     INSERT INTO SERVICIO     
     VALUES (0, p_descripcion, p_costo_servicio, p_estado, p_garantia, p_fecha_inicio, p_fecha_fin, p_id_cliente, p_id_proforma);
-    SET p_id_servicio = LAST_INSERT_ID(); 
-    COMMIT;
-    SELECT p_id_servicio;
+    SELECT LAST_INSERT_ID() AS id_servicio;
 END //
 DELIMITER ;
-
 -- sp para insertar diseño y fabricacion
 DELIMITER //
 CREATE PROCEDURE sp_insert_diseno_y_fabricacion(
