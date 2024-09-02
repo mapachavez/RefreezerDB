@@ -214,16 +214,17 @@ INSERT INTO PROFORMA VALUES
 (10, '2023-10-01', 700.00, 2100.00, 'No Aprobado', 'Calle 3', 'Mz3', 'Latacunga', '2024-07-25', '19:00:00', 'Ninguna', 10, 10);
 
 INSERT INTO SERVICIO VALUES
-(1, 'Instalación de Cámara Frigorífica', 2000.00, 'Terminado', 12, '2023-01-10', '2023-02-10', 1),
-(2, 'Mantenimiento de Sistemas de Refrigeración', 1500.00, 'En Progreso', 6, '2023-03-15', '2023-04-15', 2),
-(3, 'Instalación de Aire Acondicionado', 1800.00, 'Terminado', 12, '2023-05-20', '2023-06-20', 3),
-(4, 'Reparación de Unidad de Aire', 1600.00, 'En Progreso', 6, '2023-07-25', '2023-08-25', 4),
-(5, 'Revisión de Sistemas de Enfriamiento', 1700.00, 'Terminado', 12, '2023-09-30', '2023-10-30', 5),
-(6, 'Instalación de Enfriadores Industriales', 2200.00, 'En Progreso', 6, '2023-11-05', '2023-12-05', 6),
-(7, 'Mantenimiento de Aires Acondicionados', 1900.00, 'Terminado', 12, '2024-01-10', '2024-02-10', 7),
-(8, 'Instalación de Unidad de Refrigeración', 2100.00, 'En Progreso', 6, '2024-03-15', '2024-04-15', 8),
-(9, 'Optimización de Sistemas de Enfriamiento', 2300.00, 'Terminado', 12, '2024-05-20', '2024-06-20', 9),
-(10, 'Revisión de Equipos de Refrigeración', 2400.00, 'En Progreso', 6, '2024-07-25', '2024-08-25', 10);
+(1, 'Instalación de Cámara Frigorífica', 2000.00, 'Terminado', 12, '2023-01-10', '2023-02-10', 1, 1),
+(2, 'Mantenimiento de Sistemas de Refrigeración', 1500.00, 'En Progreso', 6, '2023-03-15', '2023-04-15', 2, 2),
+(3, 'Instalación de Aire Acondicionado', 1800.00, 'Terminado', 12, '2023-05-20', '2023-06-20', 3, 3),
+(4, 'Reparación de Unidad de Aire', 1600.00, 'En Progreso', 6, '2023-07-25', '2023-08-25', 4, 4),
+(5, 'Revisión de Sistemas de Enfriamiento', 1700.00, 'Terminado', 12, '2023-09-30', '2023-10-30', 5, 5),
+(6, 'Instalación de Enfriadores Industriales', 2200.00, 'En Progreso', 6, '2023-11-05', '2023-12-05', 6, 6),
+(7, 'Mantenimiento de Aires Acondicionados', 1900.00, 'Terminado', 12, '2024-01-10', '2024-02-10', 7, 7),
+(8, 'Instalación de Unidad de Refrigeración', 2100.00, 'En Progreso', 6, '2024-03-15', '2024-04-15', 8, 8),
+(9, 'Optimización de Sistemas de Enfriamiento', 2300.00, 'Terminado', 12, '2024-05-20', '2024-06-20', 9, 9),
+(10, 'Revisión de Equipos de Refrigeración', 2400.00, 'En Progreso', 6, '2024-07-25', '2024-08-25', 10, 10);
+
 
 INSERT INTO EMPLEADO VALUES
 (1, 'Pedro Jiménez', 'Técnico', 'pedro.j@refreezrec.com'),
