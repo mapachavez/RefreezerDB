@@ -940,25 +940,25 @@ END //
 DELIMITER ;
 
 -- Añadir por lo menos 5 usuarios y especificar por lo menos 2 permisos por usuario
-CREATE USER 'usuario1'@'localhost' IDENTIFIED BY 'p@ssw0rd1';
-CREATE USER 'usuario2'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
-CREATE USER 'usuario3'@'localhost' IDENTIFIED BY 'p@$sw0rD3';
-CREATE USER 'usuario4'@'localhost' IDENTIFIED BY 'p@ssW0Rd4';
-CREATE USER 'usuario5'@'localhost' IDENTIFIED BY 'pa$sw0rd5';
+CREATE USER 'usuarioA'@'localhost' IDENTIFIED BY 'p@ssw0rd1';
+CREATE USER 'usuarioB'@'localhost' IDENTIFIED BY 'P@s$w0rd2';
+CREATE USER 'usuarioC'@'localhost' IDENTIFIED BY 'p@$sw0rD3';
+CREATE USER 'usuarioD'@'localhost' IDENTIFIED BY 'p@ssW0Rd4';
+CREATE USER 'usuarioE'@'localhost' IDENTIFIED BY 'pa$sw0rd5';
 
-GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario1'@'localhost';
-GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario2'@'localhost';
-GRANT SELECT, DELETE ON refreezerdb.* TO 'usuario3'@'localhost';
-GRANT SELECT, INSERT ON refreezerdb.* TO 'usuario4'@'localhost';
-GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuario5'@'localhost';
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuarioA'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuarioB'@'localhost';
+GRANT SELECT, DELETE ON refreezerdb.* TO 'usuarioC'@'localhost';
+GRANT SELECT, INSERT ON refreezerdb.* TO 'usuarioD'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.* TO 'usuarioE'@'localhost';
 
 -- Debe existir por lo menos 1 permiso 1 a un stored procedure
-GRANT EXECUTE ON PROCEDURE refreezerdb.sp_insert_cliente TO 'usuario1'@'localhost';
+GRANT EXECUTE ON PROCEDURE refreezerdb.sp_insert_cliente TO 'usuarioA'@'localhost';
 -- Debe existir por lo menos 2 permisos a vistas
-GRANT SELECT, UPDATE ON refreezerdb.clientes_empresa TO 'usuario2'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.clientes_empresa TO 'usuarioB'@'localhost';
 GRANT SELECT ON refreezerdb.clientes_empresa TO 'usuario5'@'localhost';
-GRANT SELECT, UPDATE ON refreezerdb.servicios_por_empleado to 'usuario5'@'localhost';
-GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuario2'@'localhost';
+GRANT SELECT, UPDATE ON refreezerdb.servicios_por_empleado to 'usuarioE'@'localhost';
+GRANT SELECT ON refreezerdb.servicios_por_empleado to 'usuarioB'@'localhost';
 
 -- Añadir por lo menos 5 índices a su BD
 CREATE INDEX idx_cliente_nombre ON CLIENTE(nombre);
